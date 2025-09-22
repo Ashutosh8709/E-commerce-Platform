@@ -39,3 +39,5 @@ const deliverySchema = new Schema(
 	},
 	{ timestamps: true }
 );
+
+export const Delivery = mongoose.model("Delivery", deliverySchema);

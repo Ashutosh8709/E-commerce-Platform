@@ -48,3 +48,5 @@ const returnSchema = new Schema(
 	},
 	{ timestamps: true }
 );
+
+export const Return = mongoose.model("Return", returnSchema);
