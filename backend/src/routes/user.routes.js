@@ -1,8 +1,11 @@
 import { Router } from "express";
 import { verifyJwt } from "../middlewares/auth.middleware.js";
-import { registerUserValidation } from "../middlewares/validation.middleware.js";
+import {
+	registerUserValidation,
+	loginUserValidation,
+} from "../middlewares/validation.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
-import { registerUser } from "../controllers/user.controller.js";
+import { loginUser, registerUser } from "../controllers/user.controller.js";
 
 const router = Router();
 
@@ -12,5 +15,6 @@ router.post(
 	registerUserValidation,
 	registerUser
 );
+router.post("/login", loginUserValidation, loginUser);
 
 export default router;

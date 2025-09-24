@@ -16,5 +16,16 @@ const registerUserValidation = (req, res, next) => {
 	}
 	next();
 };
+const loginUserValidation = (req, res, next) => {
+	const schema = Joi.object({
+		email: Joi.string().required(),
+		password: Joi.string().min(8).max(100).required(),
+	});
+	const { error } = schema.validate(req.body);
+	if (error) {
+		throw new ApiError(400, error.message);
+	}
+	next();
+};
 
-export { registerUserValidation };
+export { registerUserValidation, loginUserValidation };

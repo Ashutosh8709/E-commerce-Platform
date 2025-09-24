@@ -5,6 +5,28 @@ import { ApiError } from "../utils/ApiError.js";
 import jwt from "jsonwebtoken";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
+const generateAccessAndRefreshToken = async (userId) => {
+	// get user
+	// generate access token from method in model
+	// generate refresh token too and save it in db
+	try {
+		const user = await User.findById(userId);
+		const accessToken = await user.generateAccessToken();
+		const refreshToken = await user.generateRefreshToken();
+
+		user.refreshToken = refreshToken;
+		await user.save({ validateBeforeSave: false });
+
+		return { accessToken, refreshToken };
+	} catch (err) {
+		console.error(err.message);
+		throw new ApiError(
+			500,
+			"Something went wrong while generating Access and Refresh Tokens"
+		);
+	}
+};
+
 const registerUser = asyncHandler(async (req, res) => {
 	// get user details from frontend
 	// validation i have used as joi middleware
@@ -59,4 +81,45 @@ const registerUser = asyncHandler(async (req, res) => {
 		);
 });
 
-export { registerUser };
+const loginUser = asyncHandler(async (req, res) => {
+	// get user data from frontend
+	// validation is done in middleware
+	// check if user exists
+	// check if password match
+	// generate token and send cookies
+	const { email, password } = req.body;
+	const user = await User.findOne({ email });
+
+	if (!user) {
+		throw new ApiError(404, "User not Exist");
+	}
+
+	const isPasswordValid = await user.isPasswordCorrect(password);
+	if (!isPasswordValid) {
+		throw new ApiError(401, "Wrong Password");
+	}
+
+	const { accessToken, refreshToken } =
+		await generateAccessAndRefreshToken(user?._id);
+
+	const loggedInUser = await User.findById(user._id).select(
+		"-password -refreshToken"
+	);
+
+	const options = {
+		httpOnly: true,
+		secure: true,
+	};
+
+	res.status(200)
+		.cookie("accessToken", accessToken, options)
+		.cookie("refreshToken", refreshToken, options)
+		.json(
+			new ApiResponse(
+				200,
+				loggedInUser,
+				"User LoggedIn Successfully"
+			)
+		);
+});
+export { registerUser, loginUser };
