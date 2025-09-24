@@ -1,5 +1,5 @@
 import Joi from "joi";
-import { ApiError } from "../utils/ApiError";
+import { ApiError } from "../utils/ApiError.js";
 
 const registerUserValidation = (req, res, next) => {
 	//name, email, password, role
@@ -12,7 +12,7 @@ const registerUserValidation = (req, res, next) => {
 
 	const { error } = schema.validate(req.body);
 	if (error) {
-		throw new ApiError(400, "Bad Request");
+		throw new ApiError(400, error.message);
 	}
 	next();
 };

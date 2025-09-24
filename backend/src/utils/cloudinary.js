@@ -1,5 +1,4 @@
 import { v2 as cloudinary } from "cloudinary";
-import { asyncHandler } from "./AsyncHandler";
 import fs from "fs";
 
 const getCloudinary = () => {
@@ -8,9 +7,10 @@ const getCloudinary = () => {
 		api_key: process.env.CLOUDINARY_API_KEY,
 		api_secret: process.env.CLOUDINARY_API_SECRET,
 	});
+	return cloudinary;
 };
 
-const uploadOnCloudinary = asyncHandler(async (localFilePath) => {
+const uploadOnCloudinary = async (localFilePath) => {
 	const cloud = getCloudinary();
 	try {
 		if (!localFilePath) {
@@ -22,10 +22,10 @@ const uploadOnCloudinary = asyncHandler(async (localFilePath) => {
 		fs.unlinkSync(localFilePath);
 		return response;
 	} catch (err) {
-		console.error("CLoudinary upload failed:", error);
+		console.error("CLoudinary upload failed:", err);
 		fs.unlinkSync(localFilePath);
 		return null;
 	}
-});
+};
 
 export { uploadOnCloudinary };
