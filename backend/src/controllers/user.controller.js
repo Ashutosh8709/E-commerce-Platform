@@ -214,7 +214,7 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 		.json(
 			new ApiResponse(
 				200,
-				req.User,
+				req.user,
 				"Current user fetched successfully"
 			)
 		);
@@ -230,7 +230,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
 		throw new ApiError(404, "Avatar Local File not found");
 	}
 
-	const avatar = uploadOnCloudinary(avatarLocalPath);
+	const avatar = await uploadOnCloudinary(avatarLocalPath);
 	if (!avatar.secure_url) {
 		throw new ApiError(
 			400,
@@ -246,7 +246,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
 			},
 		},
 		{ new: true }
-	);
+	).select("-password");
 
 	return res
 		.status(200)
@@ -275,7 +275,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
 		userId,
 		{ $set: updates },
 		{ new: true, runValidators: true }
-	);
+	).select("-password");
 
 	if (!updatedUser) {
 		throw new ApiError(404, "User not Found");
