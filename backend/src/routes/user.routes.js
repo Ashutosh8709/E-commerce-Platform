@@ -5,7 +5,16 @@ import {
 	loginUserValidation,
 } from "../middlewares/validation.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
-import { loginUser, registerUser } from "../controllers/user.controller.js";
+import {
+	loginUser,
+	registerUser,
+	changeCurrentPassword,
+	forgotPassword,
+	logoutUser,
+	getCurrentUser,
+	updateUserAvatar,
+	updateAccountDetails,
+} from "../controllers/user.controller.js";
 
 const router = Router();
 
@@ -16,5 +25,13 @@ router.post(
 	registerUser
 );
 router.post("/login", loginUserValidation, loginUser);
+router.post("/forgot-password", forgotPassword);
+
+//secured routes
+router.get("/current-user", verifyJwt, getCurrentUser);
+router.post("/logout", verifyJwt, logoutUser);
+router.post("/change-password", verifyJwt, changeCurrentPassword);
+router.patch("/avatar", verifyJwt, upload.single("avatar"), updateUserAvatar);
+router.patch("/update-account", verifyJwt, updateAccountDetails);
 
 export default router;
