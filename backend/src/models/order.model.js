@@ -1,4 +1,23 @@
 import mongoose, { Schema } from "mongoose";
+const productSchema = new Schema({
+	productId: {
+		type: Schema.Types.ObjectId,
+		ref: "Product",
+		required: true,
+	},
+	quantity: {
+		type: Number,
+		min: 1,
+		default: 1,
+		required: true,
+	},
+	priceAtPurchase: {
+		type: Number,
+		required: true,
+	},
+	color: String,
+	size: String,
+});
 
 const orderSchema = new Schema(
 	{
@@ -8,27 +27,7 @@ const orderSchema = new Schema(
 			required: true,
 			index: true,
 		},
-		products: [
-			{
-				productId: {
-					type: Schema.Types.ObjectId,
-					ref: "Product",
-					required: true,
-				},
-				quantity: {
-					type: Number,
-					min: 1,
-					default: 1,
-					required: true,
-				},
-				priceAtPurchase: {
-					type: Number,
-					required: true,
-				},
-				color: String,
-				size: String,
-			},
-		],
+		products: [productSchema],
 		paymentId: {
 			type: Schema.Types.ObjectId,
 			ref: "Payment",

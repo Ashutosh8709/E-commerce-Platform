@@ -1,5 +1,28 @@
 import mongoose, { Schema } from "mongoose";
 
+const productSchema = new Schema({
+	productId: {
+		type: Schema.Types.ObjectId,
+		ref: "Product",
+		required: true,
+	},
+	quantity: {
+		type: Number,
+		required: true,
+		min: 1,
+	},
+	priceAtAddition: {
+		type: Number,
+		required: true,
+	},
+	color: {
+		type: String,
+	},
+	size: {
+		type: String,
+	},
+});
+
 const cartSchema = new Schema(
 	{
 		owner: {
@@ -7,30 +30,7 @@ const cartSchema = new Schema(
 			ref: "User",
 			required: true,
 		},
-		products: [
-			{
-				productId: {
-					type: Schema.Types.ObjectId,
-					ref: "Product",
-					required: true,
-				},
-				quantity: {
-					type: Number,
-					required: true,
-					min: 1,
-				},
-				priceAtAddition: {
-					type: Number,
-					required: true,
-				},
-				color: {
-					type: String,
-				},
-				size: {
-					type: String,
-				},
-			},
-		],
+		products: [productSchema],
 		discount: Number,
 		promoCode: String,
 		status: {
