@@ -5,6 +5,8 @@ import {
 	signupUser,
 	logoutUser,
 	getUser,
+	forgotUserPassword,
+	verifyUserEmail,
 } from "../services/authService";
 
 const AuthContext = createContext();
@@ -71,9 +73,51 @@ export const AuthContextProvider = ({ children }) => {
 		}
 	};
 
+	const forgotPassword = async (formData) => {
+		try {
+			if (formData.newPassword !== formData.confirmPassword) {
+				return handleError(
+					"Both Passwords doesn't match"
+				);
+			}
+			await forgotUserPassword(
+				formData.email,
+				formData.newPassword
+			);
+			handleSuccess("New Password Created Successfully");
+		} catch (error) {
+			const message =
+				error?.response?.data?.message ||
+				"Something went wrong";
+			handleError(message);
+		}
+	};
+
+	const verifyUser = async (formData) => {
+		try {
+			const res = await verifyUserEmail(formData.email);
+			handleSuccess(res.data.message);
+			return true;
+		} catch (error) {
+			const message =
+				error?.response?.data?.message ||
+				"Something went wrong";
+			handleError(message);
+			return false;
+		}
+	};
+
 	return (
 		<AuthContext.Provider
-			value={{ login, user, signup, logout, loading }}
+			value={{
+				login,
+				user,
+				signup,
+				logout,
+				loading,
+				forgotPassword,
+				verifyUser,
+			}}
 		>
 			{children}
 		</AuthContext.Provider>

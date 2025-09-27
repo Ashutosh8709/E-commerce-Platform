@@ -294,6 +294,32 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
 			)
 		);
 });
+
+const verifyUser = asyncHandler(async (req, res) => {
+	// take email from req.body
+	// check if user with email is present
+	// if user email is there in db return
+	const { email } = req.body;
+
+	if (!email) {
+		throw new ApiError(400, "Email is required");
+	}
+
+	const user = await User.findOne({ email });
+	if (user) {
+		return res
+			.status(200)
+			.json(
+				new ApiResponse(
+					200,
+					{},
+					"Email has been verified successfully"
+				)
+			);
+	} else {
+		throw new ApiError(404, "User not Found");
+	}
+});
 export {
 	registerUser,
 	loginUser,
@@ -303,4 +329,5 @@ export {
 	getCurrentUser,
 	updateUserAvatar,
 	updateAccountDetails,
+	verifyUser,
 };

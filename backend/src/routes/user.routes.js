@@ -14,6 +14,7 @@ import {
 	getCurrentUser,
 	updateUserAvatar,
 	updateAccountDetails,
+	verifyUser,
 } from "../controllers/user.controller.js";
 
 const router = Router();
@@ -26,6 +27,7 @@ router.post(
 );
 router.post("/login", loginUserValidation, loginUser);
 router.post("/forgot-password", forgotPassword);
+router.post("/verify", verifyUser);
 
 //secured routes
 router.get("/current-user", verifyJwt, getCurrentUser);

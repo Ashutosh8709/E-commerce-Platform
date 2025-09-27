@@ -23,3 +23,11 @@ export const logoutUser = () => {
 export const getUser = () => {
 	return api.get("/users/current-user");
 };
+
+export const forgotUserPassword = (email, password) => {
+	return api.post("/users/forgot-password", { email, password });
+};
+
+export const verifyUserEmail = (email) => {
+	return api.post("/users/verify", { email });
+};
