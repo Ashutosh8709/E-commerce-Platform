@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Mail, Lock, Eye, EyeOff, Check, X, KeyRound } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
-function ForgotPasswordPage() {
+function ForgotPassword() {
 	const [formData, setFormData] = useState({
 		email: "",
 		newPassword: "",
@@ -292,4 +292,4 @@ function ForgotPasswordPage() {
 	);
 }
 
-export default ForgotPasswordPage;
+export default ForgotPassword;

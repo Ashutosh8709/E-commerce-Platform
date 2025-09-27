@@ -1,6 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import { Search, ShoppingCart, Package, Menu, X } from "lucide-react";
+import { Link, NavLink } from "react-router-dom";
 
 function Navbar() {
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -60,12 +61,18 @@ function Navbar() {
 
 						{/* Auth Buttons */}
 						<div className="hidden lg:flex items-center gap-3">
-							<button className="px-4 py-2 text-indigo-600 hover:text-indigo-700 font-medium transition-colors">
+							<Link
+								className="px-4 py-2 text-indigo-600 hover:text-indigo-700 font-medium transition-colors"
+								to={"/login"}
+							>
 								Login
-							</button>
-							<button className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium transition-colors">
+							</Link>
+							<Link
+								className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium transition-colors"
+								to={"/signup"}
+							>
 								Register
-							</button>
+							</Link>
 						</div>
 
 						{/* Cart */}

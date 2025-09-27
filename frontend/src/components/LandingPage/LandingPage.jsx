@@ -17,8 +17,6 @@ function LandingPage() {
 
 	return (
 		<div className="min-h-screen bg-white">
-			<Navbar />
-			{/* Hero Section */}
 			<section className="relative min-h-[600px] bg-gradient-to-br from-slate-700 via-slate-600 to-slate-800 flex items-center justify-center overflow-hidden">
 				{/* Animated background elements */}
 				<div className="absolute inset-0 overflow-hidden">
@@ -184,8 +182,6 @@ function LandingPage() {
 					</div>
 				</div>
 			</section>
-			<Footer />
-
 			<style jsx>{`
 				@keyframes blob {
 					0% {
