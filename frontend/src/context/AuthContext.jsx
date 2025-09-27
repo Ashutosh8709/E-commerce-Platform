@@ -42,10 +42,8 @@ export const AuthContextProvider = ({ children }) => {
 	};
 
 	const signup = async (formData) => {
-		const { name, email, password, confirmPassword, avatar } =
-			formData;
 		try {
-			if (password !== confirmPassword) {
+			if (formData.password !== formData.confirmPassword) {
 				return handleError(
 					"Password and Confirm Password does not match"
 				);
