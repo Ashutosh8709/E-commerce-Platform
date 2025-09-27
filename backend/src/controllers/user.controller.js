@@ -105,7 +105,7 @@ const loginUser = asyncHandler(async (req, res) => {
 		await generateAccessAndRefreshToken(user?._id);
 
 	const loggedInUser = await User.findById(user._id).select(
-		"-password -refreshToken"
+		"-password -refreshToken -createdAt -updatedAt"
 	);
 
 	const options = {
@@ -209,15 +209,18 @@ const forgotPassword = asyncHandler(async (req, res) => {
 });
 
 const getCurrentUser = asyncHandler(async (req, res) => {
-	return res
-		.status(200)
-		.json(
-			new ApiResponse(
-				200,
-				req.user,
-				"Current user fetched successfully"
-			)
-		);
+	if (req.user) {
+		return res
+			.status(200)
+			.json(
+				new ApiResponse(
+					200,
+					req.user,
+					"Current user fetched successfully"
+				)
+			);
+	}
+	throw new ApiError(404, "User not Logged in");
 });
 
 const updateUserAvatar = asyncHandler(async (req, res) => {
