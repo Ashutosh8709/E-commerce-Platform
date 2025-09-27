@@ -24,8 +24,8 @@ export const getUser = () => {
 	return api.get("/users/current-user");
 };
 
-export const forgotUserPassword = (email, password) => {
-	return api.post("/users/forgot-password", { email, password });
+export const forgotUserPassword = (email, newPassword) => {
+	return api.post("/users/forgot-password", { email, newPassword });
 };
 
 export const verifyUserEmail = (email) => {
