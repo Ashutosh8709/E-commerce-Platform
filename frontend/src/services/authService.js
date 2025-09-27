@@ -15,3 +15,11 @@ export const signupUser = (formData) => {
 		headers: { "Content-Type": "multipart/form-data" },
 	});
 };
+
+export const logoutUser = () => {
+	return api.post("/users/logout");
+};
+
+export const getUser = () => {
+	return api.get("/users/current-user");
+};

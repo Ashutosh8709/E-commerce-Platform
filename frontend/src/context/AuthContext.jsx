@@ -1,11 +1,31 @@
-import { useContext, createContext, useState } from "react";
+import { useContext, createContext, useState, useEffect } from "react";
 import { handleSuccess, handleError } from "../utils";
-import { loginUser, signupUser } from "../services/authService";
+import {
+	loginUser,
+	signupUser,
+	logoutUser,
+	getUser,
+} from "../services/authService";
 
 const AuthContext = createContext();
 
 export const AuthContextProvider = ({ children }) => {
-	const [user, setUser] = useState({});
+	const [user, setUser] = useState(null);
+	const [loading, setLoading] = useState(true);
+
+	useEffect(() => {
+		const fetchUser = async () => {
+			try {
+				const res = await getUser();
+				setUser(res.data.data);
+			} catch (error) {
+				setUser(null);
+			} finally {
+				setLoading(false);
+			}
+		};
+		fetchUser();
+	}, []);
 
 	const login = async (formData) => {
 		const { email, password } = formData;
@@ -40,8 +60,23 @@ export const AuthContextProvider = ({ children }) => {
 		}
 	};
 
+	const logout = async () => {
+		try {
+			await logoutUser();
+			setUser(null);
+			handleSuccess("User Logged Out Successfully");
+		} catch (error) {
+			const message =
+				error?.response?.data?.message ||
+				"Something went wrong";
+			handleError(message);
+		}
+	};
+
 	return (
-		<AuthContext.Provider value={{ login, user, signup }}>
+		<AuthContext.Provider
+			value={{ login, user, signup, logout, loading }}
+		>
 			{children}
 		</AuthContext.Provider>
 	);
