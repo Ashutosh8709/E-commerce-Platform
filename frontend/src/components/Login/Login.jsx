@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Mail, Lock, Eye, EyeOff, Check, X, LogIn } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 function Login() {
 	const [formData, setFormData] = useState({ email: "", password: "" });
@@ -132,12 +132,14 @@ function Login() {
 									me
 								</span>
 							</label>
-							<a
-								href="#"
+							<Link
+								to={
+									"/forgot-password"
+								}
 								className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors duration-200"
 							>
 								Forgot password?
-							</a>
+							</Link>
 						</div>
 
 						{/* Submit Button */}
@@ -213,9 +215,12 @@ function Login() {
 					<div className="text-center mt-6 pt-6 border-t border-white/10">
 						<p className="text-gray-300">
 							Don't have an account?{" "}
-							<button className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors duration-200 cursor-pointer">
+							<Link
+								to={"/signup"}
+								className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors duration-200 cursor-pointer"
+							>
 								Sign up
-							</button>
+							</Link>
 						</p>
 					</div>
 				</div>

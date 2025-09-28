@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Upload, User, Mail, Lock, Eye, EyeOff, Check, X } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 function Signup() {
 	const [formData, setFormData] = useState({
@@ -227,12 +228,12 @@ function Signup() {
 					<div className="text-center mt-6 pt-6 border-t border-white/10">
 						<p className="text-gray-300">
 							Already have an account?{" "}
-							<a
-								href="#"
+							<Link
+								to={"/login"}
 								className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors duration-200"
 							>
 								Sign in
-							</a>
+							</Link>
 						</p>
 					</div>
 				</div>
