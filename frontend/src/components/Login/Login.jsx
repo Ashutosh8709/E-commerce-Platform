@@ -1,15 +1,19 @@
 import React, { useState } from "react";
 import { Mail, Lock, Eye, EyeOff, Check, X, LogIn } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
 	const [formData, setFormData] = useState({ email: "", password: "" });
 	const [showPassword, setShowPassword] = useState(false);
 	const [rememberMe, setRememberMe] = useState(false);
 	const { login } = useAuth();
-	const handleSubmit = (e) => {
+	const navigate = useNavigate();
+
+	const handleSubmit = async (e) => {
 		e.preventDefault();
-		login(formData);
+		await login(formData);
+		navigate("/home");
 	};
 
 	const handleInputChange = (e) => {

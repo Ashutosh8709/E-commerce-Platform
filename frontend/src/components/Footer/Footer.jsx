@@ -40,6 +40,12 @@ function Footer() {
 								href="#"
 								className="text-gray-400 hover:text-white transition-colors"
 							>
+								FAQ
+							</a>
+							<a
+								href="#"
+								className="text-gray-400 hover:text-white transition-colors"
+							>
 								Privacy Policy
 							</a>
 							<a

@@ -1,7 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
-import App from "./App.jsx";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Layout from "./Layout/Layout.jsx";
 import LandingPage from "./components/LandingPage/LandingPage.jsx";
@@ -9,6 +8,9 @@ import Login from "./components/Login/Login.jsx";
 import Signup from "./components/Signup/Signup.jsx";
 import ForgotPasswordPage from "./components/Login/ForgotPassword.jsx";
 import { AuthContextProvider } from "./context/AuthContext.jsx";
+import Home from "./components/Home/Home.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import { ToastContainer } from "react-toastify";
 
 const router = createBrowserRouter([
 	{
@@ -18,6 +20,14 @@ const router = createBrowserRouter([
 			{
 				path: "",
 				element: <LandingPage />,
+			},
+			{
+				path: "/home",
+				element: (
+					<ProtectedRoute>
+						<Home />
+					</ProtectedRoute>
+				),
 			},
 		],
 	},
@@ -39,6 +49,7 @@ createRoot(document.getElementById("root")).render(
 	<StrictMode>
 		<AuthContextProvider>
 			<RouterProvider router={router} />
+			<ToastContainer />
 		</AuthContextProvider>
 	</StrictMode>
 );

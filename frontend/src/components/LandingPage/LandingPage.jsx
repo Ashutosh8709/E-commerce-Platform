@@ -1,20 +1,7 @@
 import { useState } from "react";
-import {
-	Search,
-	ShoppingCart,
-	Package,
-	Shield,
-	Clock,
-	User,
-	Menu,
-	X,
-} from "lucide-react";
-import Navbar from "../Navbar/Navbar";
-import Footer from "../Footer/Footer";
+import { Package, Shield, Clock } from "lucide-react";
 
 function LandingPage() {
-	const [isMenuOpen, setIsMenuOpen] = useState(false);
-
 	return (
 		<div className="min-h-screen bg-white">
 			<section className="relative min-h-[600px] bg-gradient-to-br from-slate-700 via-slate-600 to-slate-800 flex items-center justify-center overflow-hidden">
