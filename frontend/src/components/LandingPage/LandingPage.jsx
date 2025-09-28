@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Package, Shield, Clock } from "lucide-react";
+import { Link } from "react-router-dom";
 
 function LandingPage() {
 	return (
@@ -23,9 +24,12 @@ function LandingPage() {
 						electronics, delivered right to
 						your doorstep.
 					</p>
-					<button className="bg-indigo-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-indigo-700 transform transition-all duration-200 hover:scale-105 shadow-lg hover:shadow-xl">
+					<Link
+						to={"/home"}
+						className="bg-indigo-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-indigo-700 transform transition-all duration-200 hover:scale-105 shadow-lg hover:shadow-xl"
+					>
 						Shop Now
-					</button>
+					</Link>
 				</div>
 			</section>
 

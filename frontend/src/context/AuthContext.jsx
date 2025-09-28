@@ -14,12 +14,14 @@ const AuthContext = createContext();
 export const AuthContextProvider = ({ children }) => {
 	const [user, setUser] = useState(null);
 	const [loading, setLoading] = useState(true);
+	const [userLoggedOut, setUserLoggedout] = useState(false);
 
 	useEffect(() => {
 		const fetchUser = async () => {
 			try {
 				const res = await getUser();
 				setUser(res.data.data);
+				setUserLoggedout(false);
 			} catch (error) {
 				setUser(null);
 			} finally {
@@ -34,6 +36,7 @@ export const AuthContextProvider = ({ children }) => {
 		try {
 			const res = await loginUser(email, password);
 			setUser(res.data.data);
+			setUserLoggedout(false);
 			handleSuccess(res.data.message);
 		} catch (error) {
 			const message =
@@ -65,6 +68,7 @@ export const AuthContextProvider = ({ children }) => {
 		try {
 			await logoutUser();
 			setUser(null);
+			setUserLoggedout(true);
 			handleSuccess("User Logged Out Successfully");
 		} catch (error) {
 			const message =
@@ -118,6 +122,8 @@ export const AuthContextProvider = ({ children }) => {
 				loading,
 				forgotPassword,
 				verifyUser,
+				userLoggedOut,
+				setUserLoggedout,
 			}}
 		>
 			{children}

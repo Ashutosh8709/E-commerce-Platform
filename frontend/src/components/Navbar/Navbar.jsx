@@ -18,11 +18,18 @@ import {
 } from "lucide-react";
 import { Link, NavLink } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 function Navbar() {
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const [isProfileOpen, setIsProfileOpen] = useState(false);
 	const { user, logout } = useAuth();
+	const navigate = useNavigate;
+
+	const handleLogout = async () => {
+		await logout();
+	};
+
 	return (
 		<header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-200 shadow-sm">
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -62,7 +69,7 @@ function Navbar() {
 								href="#"
 								className="text-md font-medium text-gray-700 hover:text-indigo-600 transition-colors"
 							>
-								Services
+								New Arrivals
 							</a>
 						</nav>
 					</div>
@@ -183,8 +190,8 @@ function Navbar() {
 												{/* Sign Out */}
 												<div className="border-t border-gray-100 pt-2">
 													<button
-														onClick={() =>
-															logout()
+														onClick={
+															handleLogout
 														}
 														className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
 													>
