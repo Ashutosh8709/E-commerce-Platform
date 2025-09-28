@@ -51,6 +51,7 @@ export const AuthContextProvider = ({ children }) => {
 				);
 			}
 			const res = await signupUser(formData);
+			setUser(res.data.data);
 			handleSuccess(res.data.message);
 		} catch (error) {
 			const message =

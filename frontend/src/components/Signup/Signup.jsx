@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Upload, User, Mail, Lock, Eye, EyeOff, Check, X } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 function Signup() {
 	const [formData, setFormData] = useState({
@@ -13,12 +14,14 @@ function Signup() {
 	const [showPassword, setShowPassword] = useState(false);
 	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 	const [avatarPreview, setAvatarPreview] = useState("");
+	const navigate = useNavigate();
 
 	const { signup } = useAuth;
 
-	const handleSubmit = (e) => {
+	const handleSubmit = async (e) => {
 		e.preventDefault();
-		signup(formData);
+		await signup(formData);
+		navigate("/home");
 	};
 
 	const handleInputChange = (e) => {
