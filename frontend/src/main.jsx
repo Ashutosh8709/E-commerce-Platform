@@ -11,6 +11,8 @@ import { AuthContextProvider } from "./context/AuthContext.jsx";
 import Home from "./components/Home/Home.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import { ToastContainer } from "react-toastify";
+import Cart from "./components/Cart/Cart.jsx";
+import Products from "./components/Products/Products.jsx";
 
 const router = createBrowserRouter([
 	{
@@ -42,6 +44,14 @@ const router = createBrowserRouter([
 	{
 		path: "/forgot-password",
 		element: <ForgotPasswordPage />,
+	},
+	{
+		path: "/cart",
+		element: <Cart />,
+	},
+	{
+		path: "/products",
+		element: <Products />,
 	},
 ]);
 

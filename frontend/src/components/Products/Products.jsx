@@ -1,0 +1,504 @@
+import React, { useState } from "react";
+import {
+	ArrowLeft,
+	Star,
+	Heart,
+	ShoppingCart,
+	Plus,
+	Minus,
+} from "lucide-react";
+
+function ProductDetailPage() {
+	const [selectedImage, setSelectedImage] = useState(0);
+	const [quantity, setQuantity] = useState(1);
+	const [isProfileOpen, setIsProfileOpen] = useState(false);
+
+	const productImages = [
+		"https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg?auto=compress&cs=tinysrgb&w=600",
+		"https://images.pexels.com/photos/1649771/pexels-photo-1649771.jpeg?auto=compress&cs=tinysrgb&w=600",
+		"https://images.pexels.com/photos/1649772/pexels-photo-1649772.jpeg?auto=compress&cs=tinysrgb&w=600",
+	];
+
+	const relatedProducts = [
+		{
+			id: 1,
+			name: "Smartwatch",
+			price: 149.99,
+			image: "https://images.pexels.com/photos/393047/pexels-photo-393047.jpeg?auto=compress&cs=tinysrgb&w=400",
+		},
+		{
+			id: 2,
+			name: "Fitness Tracker",
+			price: 79.99,
+			image: "https://images.pexels.com/photos/267394/pexels-photo-267394.jpeg?auto=compress&cs=tinysrgb&w=400",
+		},
+		{
+			id: 3,
+			name: "Portable Speaker",
+			price: 59.99,
+			image: "https://images.pexels.com/photos/1649771/pexels-photo-1649771.jpeg?auto=compress&cs=tinysrgb&w=400",
+		},
+		{
+			id: 4,
+			name: "Wireless Earbuds",
+			price: 99.99,
+			image: "https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg?auto=compress&cs=tinysrgb&w=400",
+		},
+	];
+
+	const reviews = [
+		{
+			id: 1,
+			name: "Sophia Clark",
+			avatar: "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100",
+			rating: 5,
+			date: "2 months ago",
+			comment: "These headphones are amazing! The sound quality is top-notch, and the noise cancellation is incredibly effective. I can finally enjoy my music without any distractions. The battery life is also impressive. Highly recommend!",
+		},
+		{
+			id: 2,
+			name: "Ethan Bennett",
+			avatar: "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=100",
+			rating: 4,
+			date: "3 months ago",
+			comment: "I'm really happy with these headphones. The sound is clear and balanced, and the noise cancellation works well. They're comfortable to wear for long periods, and the battery life is great.",
+		},
+	];
+
+	return (
+		<div className="min-h-screen bg-gray-50">
+			{/* Header */}
+			<header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-200 shadow-sm">
+				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+					<div className="flex items-center justify-between h-16">
+						{/* Logo */}
+						<div className="flex items-center gap-8">
+							<div className="flex items-center gap-3">
+								<div className="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
+									<ShoppingCart className="w-5 h-5 text-white" />
+								</div>
+								<span className="text-xl font-bold text-gray-900">
+									ShopSmart
+								</span>
+							</div>
+
+							{/* Desktop Navigation */}
+							<nav className="hidden md:flex items-center gap-8">
+								<button className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors">
+									New
+									Arrivals
+								</button>
+								<a
+									href="#"
+									className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors"
+								>
+									Featured
+								</a>
+								<a
+									href="#"
+									className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors"
+								>
+									Sale
+								</a>
+								<a
+									href="#"
+									className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors"
+								>
+									Brands
+								</a>
+							</nav>
+						</div>
+
+						{/* Right Side */}
+						<div className="flex items-center gap-4">
+							{/* Action Buttons */}
+							<div className="flex items-center gap-2">
+								<button className="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors">
+									<Heart className="w-5 h-5" />
+								</button>
+
+								<button className="relative p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors">
+									<ShoppingCart className="w-5 h-5" />
+									<span className="absolute -top-1 -right-1 w-5 h-5 bg-indigo-600 text-white text-xs rounded-full flex items-center justify-center">
+										3
+									</span>
+								</button>
+
+								{/* Profile */}
+								<div className="relative">
+									<button
+										onClick={() =>
+											setIsProfileOpen(
+												!isProfileOpen
+											)
+										}
+										className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center border-2 border-indigo-200"
+									>
+										<div className="w-6 h-6 bg-white rounded-full"></div>
+									</button>
+
+									{/* Profile Dropdown */}
+									{isProfileOpen && (
+										<div className="absolute right-0 mt-2 w-64 bg-white/95 backdrop-blur-md rounded-xl shadow-2xl border border-gray-200/50 py-2 z-50">
+											<div className="px-4 py-3 border-b border-gray-100">
+												<div className="flex items-center gap-3">
+													<div className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
+														<div className="w-6 h-6 bg-white rounded-full"></div>
+													</div>
+													<div>
+														<p className="font-medium text-gray-900">
+															John
+															Doe
+														</p>
+														<p className="text-sm text-gray-500">
+															john.doe@example.com
+														</p>
+													</div>
+												</div>
+											</div>
+
+											<div className="py-2">
+												<button className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
+													My
+													Profile
+												</button>
+												<button className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
+													My
+													Orders
+												</button>
+												<button className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
+													Wishlist
+												</button>
+												<button className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
+													Settings
+												</button>
+											</div>
+
+											<div className="border-t border-gray-100 pt-2">
+												<button className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">
+													Sign
+													Out
+												</button>
+											</div>
+										</div>
+									)}
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</header>
+
+			{/* Main Content */}
+			<main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+				{/* Back Button */}
+				<button className="flex items-center gap-2 text-gray-600 hover:text-indigo-600 mb-6 transition-colors">
+					<ArrowLeft className="w-4 h-4" />
+					Back to Products
+				</button>
+
+				<div className="grid lg:grid-cols-2 gap-12">
+					{/* Product Images */}
+					<div className="space-y-4">
+						{/* Main Image */}
+						<div className="aspect-square w-full rounded-xl overflow-hidden bg-gray-100">
+							<img
+								src={
+									productImages[
+										selectedImage
+									]
+								}
+								alt="Wireless Noise-Canceling Headphones"
+								className="w-full h-full object-cover"
+							/>
+						</div>
+
+						{/* Thumbnail Images */}
+						<div className="grid grid-cols-3 gap-4">
+							{productImages.map(
+								(
+									image,
+									index
+								) => (
+									<button
+										key={
+											index
+										}
+										onClick={() =>
+											setSelectedImage(
+												index
+											)
+										}
+										className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${
+											selectedImage ===
+											index
+												? "border-indigo-500 ring-2 ring-indigo-200"
+												: "border-gray-200 hover:border-gray-300"
+										}`}
+									>
+										<img
+											src={
+												image
+											}
+											alt={`Product view ${
+												index +
+												1
+											}`}
+											className="w-full h-full object-cover"
+										/>
+									</button>
+								)
+							)}
+						</div>
+					</div>
+
+					{/* Product Info */}
+					<div className="space-y-6">
+						{/* Breadcrumb */}
+						<nav className="text-sm text-gray-500">
+							<span>Home</span>
+							<span className="mx-2">
+								/
+							</span>
+							<span>Electronics</span>
+							<span className="mx-2">
+								/
+							</span>
+							<span className="text-gray-900">
+								Headphones
+							</span>
+						</nav>
+
+						{/* Product Title */}
+						<h1 className="text-3xl lg:text-4xl font-bold text-gray-900">
+							Wireless Noise-Canceling
+							Headphones
+						</h1>
+
+						{/* Rating */}
+						<div className="flex items-center gap-2">
+							<div className="flex text-yellow-400">
+								{[
+									...Array(
+										4
+									),
+								].map(
+									(
+										_,
+										i
+									) => (
+										<Star
+											key={
+												i
+											}
+											className="w-5 h-5 fill-current"
+										/>
+									)
+								)}
+								<Star className="w-5 h-5 fill-current opacity-50" />
+							</div>
+							<span className="text-sm text-gray-600">
+								(125 reviews)
+							</span>
+						</div>
+
+						{/* Description */}
+						<p className="text-gray-600 leading-relaxed">
+							Experience immersive
+							sound with our wireless
+							noise-canceling
+							headphones. Featuring
+							advanced noise
+							cancellation technology,
+							crystal-clear audio, and
+							a comfortable design,
+							these headphones are
+							perfect for music lovers
+							and professionals alike.
+							Enjoy up to 20 hours of
+							battery life and
+							seamless Bluetooth
+							connectivity.
+						</p>
+
+						{/* Price */}
+						<div className="flex items-baseline gap-4">
+							<span className="text-4xl font-bold text-indigo-600">
+								$199.99
+							</span>
+							<span className="text-xl text-gray-400 line-through">
+								$249.99
+							</span>
+						</div>
+
+						{/* Quantity Selector */}
+						<div className="flex items-center gap-4">
+							<span className="text-sm font-medium text-gray-700">
+								Quantity:
+							</span>
+							<div className="flex items-center border border-gray-300 rounded-lg">
+								<button
+									onClick={() =>
+										setQuantity(
+											Math.max(
+												1,
+												quantity -
+													1
+											)
+										)
+									}
+									className="p-2 hover:bg-gray-100 transition-colors"
+								>
+									<Minus className="w-4 h-4" />
+								</button>
+								<span className="px-4 py-2 font-medium">
+									{
+										quantity
+									}
+								</span>
+								<button
+									onClick={() =>
+										setQuantity(
+											quantity +
+												1
+										)
+									}
+									className="p-2 hover:bg-gray-100 transition-colors"
+								>
+									<Plus className="w-4 h-4" />
+								</button>
+							</div>
+						</div>
+
+						{/* Action Buttons */}
+						<div className="flex gap-4">
+							<button className="flex-1 bg-indigo-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-indigo-700 transition-colors shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
+								<ShoppingCart className="w-5 h-5" />
+								Add to Cart
+							</button>
+							<button className="bg-gray-200 text-gray-800 font-semibold py-3 px-6 rounded-lg hover:bg-gray-300 transition-colors flex items-center justify-center gap-2">
+								<Heart className="w-5 h-5" />
+								Add to Wishlist
+							</button>
+						</div>
+					</div>
+				</div>
+
+				{/* Customer Reviews */}
+				<div className="mt-16">
+					<h2 className="text-2xl font-bold text-gray-900 mb-8">
+						Customer Reviews
+					</h2>
+					<div className="grid md:grid-cols-2 gap-8">
+						{reviews.map((review) => (
+							<div
+								key={review.id}
+								className="bg-white p-6 rounded-lg shadow-sm border border-gray-200"
+							>
+								<div className="flex items-center gap-4 mb-4">
+									<img
+										src={
+											review.avatar
+										}
+										alt={
+											review.name
+										}
+										className="w-12 h-12 rounded-full object-cover"
+									/>
+									<div>
+										<p className="font-semibold text-gray-900">
+											{
+												review.name
+											}
+										</p>
+										<p className="text-sm text-gray-500">
+											{
+												review.date
+											}
+										</p>
+									</div>
+								</div>
+								<div className="flex text-yellow-400 mb-2">
+									{[
+										...Array(
+											review.rating
+										),
+									].map(
+										(
+											_,
+											i
+										) => (
+											<Star
+												key={
+													i
+												}
+												className="w-4 h-4 fill-current"
+											/>
+										)
+									)}
+								</div>
+								<p className="text-gray-600">
+									{
+										review.comment
+									}
+								</p>
+							</div>
+						))}
+					</div>
+				</div>
+
+				{/* Related Products */}
+				<div className="mt-16">
+					<h2 className="text-2xl font-bold text-gray-900 mb-8">
+						Related Products
+					</h2>
+					<div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+						{relatedProducts.map(
+							(product) => (
+								<div
+									key={
+										product.id
+									}
+									className="group"
+								>
+									<div className="aspect-square w-full bg-gray-100 rounded-lg mb-4 overflow-hidden">
+										<img
+											src={
+												product.image
+											}
+											alt={
+												product.name
+											}
+											className="w-full h-full object-cover transition-transform group-hover:scale-105"
+										/>
+									</div>
+									<h3 className="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
+										{
+											product.name
+										}
+									</h3>
+									<p className="text-gray-600">
+										$
+										{
+											product.price
+										}
+									</p>
+								</div>
+							)
+						)}
+					</div>
+				</div>
+			</main>
+
+			{/* Click outside to close dropdown */}
+			{isProfileOpen && (
+				<div
+					className="fixed inset-0 z-40"
+					onClick={() => setIsProfileOpen(false)}
+				/>
+			)}
+		</div>
+	);
+}
+
+export default ProductDetailPage;

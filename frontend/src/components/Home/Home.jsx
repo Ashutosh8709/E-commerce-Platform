@@ -1,30 +1,12 @@
 import React from "react";
-import {
-	Search,
-	ShoppingCart,
-	Package,
-	User,
-	Menu,
-	X,
-	Heart,
-	Settings,
-	ShoppingBag,
-	CreditCard,
-	MapPin,
-	HelpCircle,
-	LogOut,
-	ChevronDown,
-} from "lucide-react";
-import Navbar from "../Navbar/Navbar";
 
 function LandingPage() {
-	const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 	const [isProfileOpen, setIsProfileOpen] = React.useState(true);
 
 	return (
 		<div className="min-h-screen bg-white">
 			{/* Main Content */}
-			<main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+			<main className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
 				{/* Hero Section */}
 				<div
 					className="relative mb-12 min-h-[480px] rounded-xl overflow-hidden flex items-end justify-start p-8 text-white bg-cover bg-center"
