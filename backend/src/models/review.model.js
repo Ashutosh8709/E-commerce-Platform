@@ -7,14 +7,10 @@ const reviewSchema = new Schema(
 			ref: "Product",
 			index: true,
 		},
-		userId: {
+		owner: {
 			type: Schema.Types.ObjectId,
 			ref: "User",
 			index: true,
-		},
-		orderId: {
-			type: Schema.Types.ObjectId,
-			ref: "Order",
 		},
 		rating: {
 			type: Number,
@@ -34,5 +30,7 @@ const reviewSchema = new Schema(
 	},
 	{ timestamps: true }
 );
+
+reviewSchema.index({ productId: 1, owner: 1 }, { unique: true });
 
 export const Review = mongoose.model("Review", reviewSchema);

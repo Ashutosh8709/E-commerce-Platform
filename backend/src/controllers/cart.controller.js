@@ -61,6 +61,8 @@ const addToCart = asyncHandler(async (req, res) => {
 });
 
 const getCart = asyncHandler(async (req, res) => {
+	// get user id from req.user
+	// find if user has cart and if yes return it
 	const userId = req.user?._id;
 	const cart = await Cart.findOne({ owner: userId });
 	if (!cart) {
@@ -74,6 +76,10 @@ const getCart = asyncHandler(async (req, res) => {
 });
 
 const updateQuantity = asyncHandler(async (req, res) => {
+	// get productId and quantity from req.body
+	// find user's cart
+	// find that product in cart and mark the new quantity of it
+	// also at last convert price and update it
 	const { productId, quantity } = req.body;
 	const userId = req.user?._id;
 
@@ -109,6 +115,7 @@ const updateQuantity = asyncHandler(async (req, res) => {
 });
 
 const removeItem = asyncHandler(async (req, res) => {
+	// get product id from req.body and filter out the cart or pull
 	const { productId } = req.body;
 	const userId = req.user?._id;
 
@@ -134,6 +141,7 @@ const removeItem = asyncHandler(async (req, res) => {
 });
 
 const clearCart = asyncHandler(async (req, res) => {
+	// get user if and find and update cart for no products
 	const userId = req.user?._id;
 	const cart = await Cart.findOneAndUpdate(
 		{ owner: userId },
@@ -158,6 +166,8 @@ const clearCart = asyncHandler(async (req, res) => {
 });
 
 const savedForLater = asyncHandler(async (req, res) => {
+	// get product id from body
+	// find cart for user and check if product is in cart and save it savedForLatre
 	const { productId } = req.body;
 	const userId = req.user?._id;
 
@@ -186,6 +196,10 @@ const savedForLater = asyncHandler(async (req, res) => {
 });
 
 const applyPromoCode = asyncHandler(async (req, res) => {
+	// get code from body
+	// find cart
+	// find discount from promo
+	// update final price
 	const { code } = req.body;
 	const userId = req.user?._id;
 
