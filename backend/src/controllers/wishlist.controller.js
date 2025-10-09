@@ -18,6 +18,29 @@ const addToWishlist = asyncHandler(async (req, res) => {
 	if (!userId) {
 		throw new ApiError(401, "Unauthorised Access");
 	}
+
+	const existingWishListProduct = await Wishlist.findOne({
+		owner: userId,
+		"products.productId": productId,
+	});
+
+	if (existingWishListProduct) {
+		throw new ApiError(400, "Product Already exists in wishlist");
+	}
+
+	const wishlist = await Wishlist.create({
+		owner: userId,
+		"products.productId": productId,
+	});
+
+	if (!wishlist) {
+		throw new ApiError(400, "Error in Adding product to wishlist");
+	}
+
+	return res.status(200).json(200, wishlist, "Product Added to Wishlist");
 });
 
-export { addToWishlist };
+const removeFromWishlist = asyncHandler(async (req, res) => {
+	// get user
+});
+export { addToWishlist, removeFromWishlist };
