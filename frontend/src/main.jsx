@@ -13,6 +13,8 @@ import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import { ToastContainer } from "react-toastify";
 import Cart from "./components/Cart/Cart.jsx";
 import Products from "./components/Products/Products.jsx";
+import OrderTracking from "./components/OrderTracking/OrderTracking.jsx";
+import Checkout from "./components/CheckOut/CheckOut.jsx";
 
 const router = createBrowserRouter([
 	{
@@ -52,6 +54,14 @@ const router = createBrowserRouter([
 	{
 		path: "/products",
 		element: <Products />,
+	},
+	{
+		path: "/order-track",
+		element: <OrderTracking />,
+	},
+	{
+		path: "/checkout",
+		element: <Checkout />,
 	},
 ]);
 
