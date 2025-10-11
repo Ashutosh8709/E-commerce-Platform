@@ -174,7 +174,29 @@ const clearWishlist = asyncHandler(async (req, res) => {
 		.json(new ApiResponse(200, {}, "Wishlist Cleared"));
 });
 
-const getWishlist = asyncHandler(async (req, res) => {});
+const getWishlist = asyncHandler(async (req, res) => {
+	// get user id from req.user
+	// find wishlist for that user
+	const userId = req.user?._id;
+	if (!userId) {
+		throw new ApiError(401, "Unauthorized Access");
+	}
+
+	const wishlist = await Wishlist.findOne({ owner: userId });
+	if (!wishlist) {
+		throw new ApiError(400, "Wishlist not found");
+	}
+
+	return res
+		.status(200)
+		.json(
+			new ApiResponse(
+				200,
+				wishlist,
+				"Wishlist fetched Successfully"
+			)
+		);
+});
 export {
 	addToWishlist,
 	removeFromWishlist,
