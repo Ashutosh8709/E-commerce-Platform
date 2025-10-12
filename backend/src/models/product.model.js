@@ -34,12 +34,10 @@ const productSchema = new Schema(
 			ref: "Category",
 			required: true,
 		},
-		productImages: [
-			{
-				type: String,
-				required: true,
-			},
-		],
+		productImage: {
+			type: String,
+			required: true,
+		},
 	},
 	{ timestamps: true }
 );
