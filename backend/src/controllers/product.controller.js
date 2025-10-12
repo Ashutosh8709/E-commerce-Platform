@@ -102,7 +102,58 @@ const createProduct = asyncHandler(async (req, res) => {
 		);
 });
 
-const updateProduct = asyncHandler(async (req, res) => {});
+const updateProduct = asyncHandler(async (req, res) => {
+	const userId = req.user?._id;
+
+	if (!userId) {
+		throw new ApiError(401, "Unauthorized Access");
+	}
+
+	const role = req.user?.role;
+	if (role !== "admin" && role !== "seller") {
+		throw new ApiError(
+			400,
+			"Only seller and admin are allowed to update the project"
+		);
+	}
+
+	const { productId } = req.params;
+
+	if (!productId) {
+		throw new ApiError(400, "Product id is required");
+	}
+	const { name, description, originalPrice, offeredPrice, colors } =
+		req.body;
+
+	const fieldsToUpdate = {};
+	if (name) fieldsToUpdate.name = name;
+	if (description) fieldsToUpdate.description = description;
+	if (originalPrice) fieldsToUpdate.originalPrice = originalPrice;
+	if (offeredPrice) fieldsToUpdate.offeredPrice = offeredPrice;
+	if (colors.length) fieldsToUpdate.colors = colors;
+
+	const updatedProduct = await Product.findByIdAndUpdate(
+		productId,
+		{
+			$set: fieldsToUpdate,
+		},
+		{ new: true, runValidators: true }
+	);
+
+	if (!updatedProduct) {
+		throw new ApiError(400, "Product not updated");
+	}
+
+	return res
+		.status(200)
+		.json(
+			new ApiResponse(
+				200,
+				updatedProduct,
+				"Product Updated Successfully"
+			)
+		);
+});
 
 const deleteProduct = asyncHandler(async (req, res) => {
 	// get product id from req.params
