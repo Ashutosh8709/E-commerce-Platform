@@ -155,6 +155,25 @@ const getProductById = asyncHandler(async (req, res) => {
 	// get product id
 	// search for product
 	// if exist send
+	const { productId } = req.params;
+	if (!productId) {
+		throw new ApiError(400, "Product Id is required");
+	}
+
+	const product = await Product.findById(productId);
+	if (!product) {
+		throw new ApiError(400, "Product not found");
+	}
+
+	return res
+		.status(200)
+		.json(
+			new ApiResponse(
+				200,
+				product,
+				"Product fetched Successfully"
+			)
+		);
 });
 
 const getProducts = asyncHandler(async (req, res) => {});
