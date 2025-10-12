@@ -234,4 +234,4 @@ const updateReviewImage = asyncHandler(async (req, res) => {
 		);
 });
 
-export { addReview, getReviews, updateReview, deleteReview };
+export { addReview, getReviews, updateReview, deleteReview, updateReviewImage };
