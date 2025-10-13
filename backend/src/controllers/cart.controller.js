@@ -11,8 +11,8 @@ const addToCart = asyncHandler(async (req, res) => {
 	// if the user has cart already add product
 	// if same product already exists then add quantity
 	// otherwise create add new product
-
-	const { productId, quantity, color, size } = req.body;
+	const { productId } = req.params;
+	const { quantity, color, size } = req.body;
 	const userId = req.user?._id;
 
 	const product = await Product.findById(productId);
@@ -80,7 +80,8 @@ const updateQuantity = asyncHandler(async (req, res) => {
 	// find user's cart
 	// find that product in cart and mark the new quantity of it
 	// also at last convert price and update it
-	const { productId, quantity } = req.body;
+	const { productId } = req.params;
+	const { quantity } = req.body;
 	const userId = req.user?._id;
 
 	let cart = await Cart.findOne({ owner: userId });
@@ -116,7 +117,7 @@ const updateQuantity = asyncHandler(async (req, res) => {
 
 const removeItem = asyncHandler(async (req, res) => {
 	// get product id from req.body and filter out the cart or pull
-	const { productId } = req.body;
+	const { productId } = req.params;
 	const userId = req.user?._id;
 
 	const cart = await Cart.findOneAndUpdate(
@@ -168,7 +169,7 @@ const clearCart = asyncHandler(async (req, res) => {
 const savedForLater = asyncHandler(async (req, res) => {
 	// get product id from body
 	// find cart for user and check if product is in cart and save it savedForLatre
-	const { productId } = req.body;
+	const { productId } = req.params;
 	const userId = req.user?._id;
 
 	const cart = await Cart.findOneAndUpdate(

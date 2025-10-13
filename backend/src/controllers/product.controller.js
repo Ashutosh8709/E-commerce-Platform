@@ -104,6 +104,7 @@ const createProduct = asyncHandler(async (req, res) => {
 
 const updateProduct = asyncHandler(async (req, res) => {
 	const userId = req.user?._id;
+	const { productId } = req.params;
 
 	if (!userId) {
 		throw new ApiError(401, "Unauthorized Access");
@@ -116,8 +117,6 @@ const updateProduct = asyncHandler(async (req, res) => {
 			"Only seller and admin are allowed to update the project"
 		);
 	}
-
-	const { productId } = req.params;
 
 	if (!productId) {
 		throw new ApiError(400, "Product id is required");

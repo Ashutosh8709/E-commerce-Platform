@@ -18,8 +18,16 @@ app.use(cookieParser());
 
 //ROUTES
 import userRouter from "./routes/user.routes.js";
+import cartRouter from "./routes/cart.routes.js";
+import productRouter from "./routes/product.routes.js";
+import reviewRouter from "./routes/review.routes.js";
+import wishlistRouter from "./routes/wishlist.routes.js";
 
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/cart", cartRouter);
+app.use("/api/v1/product", productRouter);
+app.use("/api/v1/review", reviewRouter);
+app.use("/api/v1/wishlist", wishlistRouter);
 
 // http://localhost:8080/api/v1/users/register
 app.use(errorHandler);
