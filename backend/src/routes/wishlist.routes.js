@@ -10,14 +10,14 @@ import {
 
 const router = Router();
 
-router.post("/wishlist/:productId", verifyJwt, addToWishlist);
+router.post("/:productId", verifyJwt, addToWishlist);
 
-router.get("/wishlist", verifyJwt, getWishlist);
+router.get("/", verifyJwt, getWishlist);
 
-router.delete("/wishlist/:productId", verifyJwt, removeFromWishlist);
+router.delete("/:productId", verifyJwt, removeFromWishlist);
 
-router.post("/wishlist/:productId/move-to-cart", verifyJwt, addToCart);
+router.post("/:productId/move-to-cart", verifyJwt, addToCart);
 
-router.delete("/wishlist", verifyJwt, clearWishlist);
+router.delete("/", verifyJwt, clearWishlist);
 
 export default router;

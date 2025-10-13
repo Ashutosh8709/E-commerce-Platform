@@ -11,12 +11,12 @@ import { upload } from "../middlewares/multer.middleware.js";
 
 const router = Router();
 
-router.post("/:productId/review", verifyJwt, addReview);
-router.get("/:productId/reviews", getReviews);
-router.patch("/:productId/review", verifyJwt, updateReview);
-router.delete("/:productId/review", verifyJwt, deleteReview);
+router.post("/:productId", verifyJwt, addReview);
+router.get("/:productId", getReviews);
+router.patch("/:productId", verifyJwt, updateReview);
+router.delete("/:productId", verifyJwt, deleteReview);
 router.patch(
-	"/:productId/review/image",
+	"/:productId/image",
 	verifyJwt,
 	upload.single("reviewImage"),
 	updateReviewImage
