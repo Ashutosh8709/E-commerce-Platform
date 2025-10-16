@@ -15,6 +15,7 @@ import {
 	MapPin,
 	Settings,
 	HelpCircle,
+	Bell,
 } from "lucide-react";
 import { Link, NavLink } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
@@ -105,9 +106,24 @@ function Navbar() {
 
 								{/* Action Buttons */}
 								<div className="flex items-center gap-2">
-									<button className="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors">
-										<Heart className="w-5 h-5" />
-									</button>
+									<NavLink
+										to="/cart"
+										className={({
+											isActive,
+										}) =>
+											`block py-2 pr-4 pl-3 duration-200 ${
+												isActive
+													? "text-indigo-600 bg-indigo-50"
+													: "text-gray-700"
+											} 
+										relative p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors`
+										}
+									>
+										<Bell className="w-5 h-5" />
+										<span className="absolute -top-1 -right-1 w-5 h-5 bg-indigo-600 text-white text-xs rounded-full flex items-center justify-center">
+											3
+										</span>
+									</NavLink>
 
 									<NavLink
 										to="/cart"
