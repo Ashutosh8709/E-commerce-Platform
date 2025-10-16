@@ -111,7 +111,7 @@ function Navbar() {
 										className={({
 											isActive,
 										}) =>
-											`block py-2 pr-4 pl-3 duration-200 ${
+											`block py-2 pr-3 pl-3 duration-200 ${
 												isActive
 													? "text-indigo-600 bg-indigo-50"
 													: "text-gray-700"
