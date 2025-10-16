@@ -173,45 +173,78 @@ function Navbar() {
 
 												{/* Menu Items */}
 												<div className="py-2">
-													<button className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
+													<Link
+														to="/profile"
+														className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+													>
 														<User className="w-4 h-4" />
 														My
 														Profile
-													</button>
+													</Link>
 
-													<button className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
+													<Link
+														to={
+															"/orders"
+														}
+														className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+													>
 														<ShoppingBag className="w-4 h-4" />
 														My
 														Orders
-													</button>
+													</Link>
 
-													<button className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
+													<Link
+														to={
+															"/wishlist"
+														}
+														className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+													>
 														<Heart className="w-4 h-4" />
 														Wishlist
-													</button>
+													</Link>
 
-													<button className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
+													<Link
+														to={
+															"/paymentmethods"
+														}
+														className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+													>
 														<CreditCard className="w-4 h-4" />
 														Payment
 														Methods
-													</button>
+													</Link>
 
-													<button className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
+													<Link
+														to={
+															"/address"
+														}
+														className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+													>
 														<MapPin className="w-4 h-4" />
 														Addresses
-													</button>
+													</Link>
 
-													<button className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
+													<Link
+														to={
+															"/settings"
+														}
+														className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+													>
 														<Settings className="w-4 h-4" />
 														Settings
-													</button>
+													</Link>
 
-													<button className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
+													<Link
+														to={
+															"/support"
+														}
+														className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+													>
 														<HelpCircle className="w-4 h-4" />
 														Help
 														&
 														Support
-													</button>
+													</Link>
 												</div>
 
 												{/* Sign Out */}

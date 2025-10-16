@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ShoppingCart, Heart, Plus, Minus, Trash2 } from "lucide-react";
+import { Plus, Minus, Trash2 } from "lucide-react";
 
 function ShoppingCartPage() {
 	const [isProfileOpen, setIsProfileOpen] = useState(false);
