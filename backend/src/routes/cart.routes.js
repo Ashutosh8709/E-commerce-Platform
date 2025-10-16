@@ -6,7 +6,7 @@ import {
 	updateQuantity,
 	removeItem,
 	clearCart,
-	saveForLater,
+	savedForLater,
 	applyPromoCode,
 	placeOrder,
 } from "../controllers/cart.controller.js";
@@ -17,7 +17,7 @@ router.get("/", verifyJwt, getCart);
 router.patch("/:productId/quantity", verifyJwt, updateQuantity);
 router.delete("/:productId", verifyJwt, removeItem);
 router.delete("/", verifyJwt, clearCart);
-router.post("/:productId/save", verifyJwt, saveForLater);
+router.post("/:productId/save", verifyJwt, savedForLater);
 router.post("/promo", verifyJwt, applyPromoCode);
 router.post("/place-order", verifyJwt, placeOrder);
 

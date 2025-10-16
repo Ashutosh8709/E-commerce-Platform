@@ -3,7 +3,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Product } from "../models/product.model.js";
 import { Category } from "../models/category.model.js";
-import { uploadOnCLoudinary } from "../utils/cloudinary.js";
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const createProduct = asyncHandler(async (req, res) => {
 	// get user which is seller id from req.user
@@ -70,7 +70,7 @@ const createProduct = asyncHandler(async (req, res) => {
 		throw new ApiError(400, "Local path for image not found");
 	}
 
-	const uploadedImage = await uploadOnCLoudinary(localProductImage);
+	const uploadedImage = await uploadOnCloudinary(localProductImage);
 	if (!uploadedImage) {
 		throw new ApiError(400, "Error while uploading file on cloud");
 	}

@@ -47,30 +47,45 @@ function Navbar() {
 
 						{/* Desktop Navigation */}
 						<nav className="hidden md:flex items-center gap-8">
-							<a
-								href="#"
-								className="text-md font-medium text-gray-700 hover:text-indigo-600 transition-colors"
+							<NavLink
+								to="/home"
+								className={({
+									isActive,
+								}) =>
+									`block py-2 pr-4 pl-3 duration-200 ${
+										isActive
+											? "text-indigo-600"
+											: "text-gray-700"
+									} 
+								
+								"text-md
+								font-medium
+								text-gray-700
+								hover:text-indigo-600
+								transition-colors`
+								}
 							>
+								{" "}
 								Home
-							</a>
-							<a
-								href="#"
+							</NavLink>
+							<Link
+								to="/products	"
 								className="text-md font-medium text-gray-700 hover:text-indigo-600 transition-colors"
 							>
 								Shop
-							</a>
-							<a
+							</Link>
+							<Link
 								href="#"
 								className="text-md font-medium text-gray-700 hover:text-indigo-600 transition-colors"
 							>
 								Deals
-							</a>
-							<a
+							</Link>
+							<Link
 								href="#"
 								className="text-md font-medium text-gray-700 hover:text-indigo-600 transition-colors"
 							>
 								New Arrivals
-							</a>
+							</Link>
 						</nav>
 					</div>
 
@@ -94,12 +109,24 @@ function Navbar() {
 										<Heart className="w-5 h-5" />
 									</button>
 
-									<button className="relative p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors">
+									<NavLink
+										to="/cart"
+										className={({
+											isActive,
+										}) =>
+											`block py-2 pr-4 pl-3 duration-200 ${
+												isActive
+													? "text-indigo-600 bg-indigo-50"
+													: "text-gray-700"
+											} 
+										relative p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors`
+										}
+									>
 										<ShoppingCart className="w-5 h-5" />
 										<span className="absolute -top-1 -right-1 w-5 h-5 bg-indigo-600 text-white text-xs rounded-full flex items-center justify-center">
 											3
 										</span>
-									</button>
+									</NavLink>
 
 									{/* Profile Dropdown */}
 									<div className="relative">

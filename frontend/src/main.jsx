@@ -3,18 +3,18 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Layout from "./Layout/Layout.jsx";
-import LandingPage from "./components/LandingPage/LandingPage.jsx";
-import Login from "./components/Login/Login.jsx";
-import Signup from "./components/Signup/Signup.jsx";
-import ForgotPasswordPage from "./components/Login/ForgotPassword.jsx";
+import LandingPage from "./Pages/LandingPage/LandingPage.jsx";
+import Login from "./Pages/Login/Login.jsx";
+import Signup from "./Pages/Signup/Signup.jsx";
+import ForgotPasswordPage from "./Pages/Login/ForgotPassword.jsx";
 import { AuthContextProvider } from "./context/AuthContext.jsx";
-import Home from "./components/Home/Home.jsx";
+import Home from "./Pages/Home/Home.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import { ToastContainer } from "react-toastify";
-import Cart from "./components/Cart/Cart.jsx";
-import Products from "./components/Products/Products.jsx";
-import OrderTracking from "./components/OrderTracking/OrderTracking.jsx";
-import Checkout from "./components/CheckOut/CheckOut.jsx";
+import Cart from "./Pages/Cart/Cart.jsx";
+import Products from "./Pages/Products/Products.jsx";
+import OrderTracking from "./Pages/OrderTracking/OrderTracking.jsx";
+import Checkout from "./Pages/CheckOut/CheckOut.jsx";
 
 const router = createBrowserRouter([
 	{
@@ -33,6 +33,38 @@ const router = createBrowserRouter([
 					</ProtectedRoute>
 				),
 			},
+			{
+				path: "/cart",
+				element: (
+					<ProtectedRoute>
+						<Cart />
+					</ProtectedRoute>
+				),
+			},
+			{
+				path: "/products",
+				element: (
+					<ProtectedRoute>
+						<Products />
+					</ProtectedRoute>
+				),
+			},
+			{
+				path: "/order-track",
+				element: (
+					<ProtectedRoute>
+						<OrderTracking />
+					</ProtectedRoute>
+				),
+			},
+			{
+				path: "/checkout",
+				element: (
+					<ProtectedRoute>
+						<Checkout />
+					</ProtectedRoute>
+				),
+			},
 		],
 	},
 	{
@@ -46,22 +78,6 @@ const router = createBrowserRouter([
 	{
 		path: "/forgot-password",
 		element: <ForgotPasswordPage />,
-	},
-	{
-		path: "/cart",
-		element: <Cart />,
-	},
-	{
-		path: "/products",
-		element: <Products />,
-	},
-	{
-		path: "/order-track",
-		element: <OrderTracking />,
-	},
-	{
-		path: "/checkout",
-		element: <Checkout />,
 	},
 ]);
 

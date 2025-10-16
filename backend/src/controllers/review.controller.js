@@ -1,8 +1,8 @@
-import { asyncHandler } from "../utils/AsyncHandler";
-import { Review } from "../models/review.model";
-import { ApiResponse } from "../utils/ApiResponse";
-import { ApiError } from "../utils/ApiError";
-import { uploadOnCloudinary } from "../utils/cloudinary";
+import { asyncHandler } from "../utils/AsyncHandler.js";
+import { Review } from "../models/review.model.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { ApiError } from "../utils/ApiError.js";
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const addReview = asyncHandler(async (req, res) => {
 	// take productId from req.params
