@@ -16,7 +16,6 @@ import {
 const router = Router();
 
 // ✅ User Routes
-router.post("/place", verifyJwt, placeOrder);
 router.get("/user", verifyJwt, getUserOrders);
 router.get("/:orderId", verifyJwt, getOrderById);
 router.patch("/:orderId/cancel", verifyJwt, cancelOrder);
