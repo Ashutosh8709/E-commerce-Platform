@@ -226,11 +226,77 @@ const getProductById = asyncHandler(async (req, res) => {
 		);
 });
 
-const getProducts = asyncHandler(async (req, res) => {});
+const getProducts = asyncHandler(async (req, res) => {
+	const products = await Product.find({});
+	if (!products || !products.length === 0) {
+		throw new ApiError(400, "No Product Available");
+	}
 
-const getProductsByCategory = asyncHandler(async (req, res) => {});
+	return res
+		.status(200)
+		.json(
+			new ApiResponse(
+				200,
+				products,
+				"Products Fetched Successfully"
+			)
+		);
+});
 
-const getFeaturedProducts = asyncHandler(async (req, res) => {});
+const getProductsByCategory = asyncHandler(async (req, res) => {
+	// take categoryid from req.params
+	const { categoryId } = req.params;
+	if (!categoryId) {
+		throw new ApiError(400, "Category Id is required");
+	}
+
+	const isCategory = await Category.findById(categoryId);
+
+	if (!isCategory) {
+		throw new ApiError(404, "Category is not found");
+	}
+
+	const products = await Product.find({ categoryId: categoryId }).sort({
+		createdAt: -1,
+	});
+
+	if (products.length === 0) {
+		throw new ApiError(
+			404,
+			"Products for this category not available"
+		);
+	}
+
+	return res
+		.status(200)
+		.json(
+			new ApiResponse(
+				200,
+				products,
+				"Products fetched by Category"
+			)
+		);
+});
+
+const getFeaturedProducts = asyncHandler(async (req, res) => {
+	const featuredProducts = await Product.find({ isFeatured: true }).sort({
+		createdAt: -1,
+	});
+
+	if (!featuredProducts || featuredProducts.length === 0) {
+		throw new ApiError(400, "No Featured Product Found");
+	}
+
+	return res
+		.status(200)
+		.json(
+			new ApiResponse(
+				200,
+				featuredProducts,
+				"Featured Products Fetched Successfully"
+			)
+		);
+});
 
 const getNewArrivals = asyncHandler(async (req, res) => {});
 
