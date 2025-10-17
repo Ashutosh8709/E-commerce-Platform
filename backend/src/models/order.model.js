@@ -28,6 +28,24 @@ const orderSchema = new Schema(
 			index: true,
 		},
 		products: [productSchema],
+		paymentStatus: {
+			type: String,
+			enum: ["pending", "paid", "failed", "refunded"],
+			default: "pending",
+			required: true,
+		},
+
+		refundStatus: {
+			type: String,
+			enum: [
+				"none",
+				"initiated",
+				"processing",
+				"completed",
+				"failed",
+			],
+			default: "none",
+		},
 		paymentId: {
 			type: Schema.Types.ObjectId,
 			ref: "Payment",
