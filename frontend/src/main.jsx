@@ -24,6 +24,7 @@ import PaymentMethods from "./Pages/PaymentMethods/PaymentMethods.jsx";
 
 import Wishlist from "./Pages/Wishlist/Wishlist.jsx";
 import SettingsPage from "./Pages/Settings/SettingsPage.jsx";
+import DealsNewArrivalsPage from "./Pages/Deals/Deals.jsx";
 
 const router = createBrowserRouter([
 	{
@@ -127,6 +128,14 @@ const router = createBrowserRouter([
 				element: (
 					<ProtectedRoute>
 						<Wishlist />
+					</ProtectedRoute>
+				),
+			},
+			{
+				path: "/deals",
+				element: (
+					<ProtectedRoute>
+						<DealsNewArrivalsPage />
 					</ProtectedRoute>
 				),
 			},

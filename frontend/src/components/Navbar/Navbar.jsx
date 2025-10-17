@@ -75,18 +75,27 @@ function Navbar() {
 							>
 								Shop
 							</Link>
-							<Link
-								href="#"
-								className="text-md font-medium text-gray-700 hover:text-indigo-600 transition-colors"
+							<NavLink
+								to="/deals"
+								className={({
+									isActive,
+								}) =>
+									`block py-2 pr-4 pl-3 duration-200 ${
+										isActive
+											? "text-indigo-600"
+											: "text-gray-700"
+									} 
+								
+								"text-md
+								font-medium
+								text-gray-700
+								hover:text-indigo-600
+								transition-colors`
+								}
 							>
-								Deals
-							</Link>
-							<Link
-								href="#"
-								className="text-md font-medium text-gray-700 hover:text-indigo-600 transition-colors"
-							>
-								New Arrivals
-							</Link>
+								{" "}
+								Deals & Arrivals
+							</NavLink>
 						</nav>
 					</div>
 
