@@ -28,6 +28,10 @@ const productSchema = new Schema(
 			required: true,
 			min: 0,
 		},
+		size: {
+			type: String,
+			required: true,
+		},
 		colors: [{ type: String }],
 		categoryId: {
 			type: Schema.Types.ObjectId,

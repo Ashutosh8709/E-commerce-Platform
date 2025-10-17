@@ -20,13 +20,15 @@ const addToCart = asyncHandler(async (req, res) => {
 		throw new ApiError(404, "Product not Found");
 	}
 
+	const price = product.offeredPrice;
+
 	let cart = await Cart.findOne({ owner: userId });
 	if (!cart) {
 		cart = new Cart({ owner: userId, products: [] });
 	}
 
 	const existingProduct = cart.products.find((p) => {
-		p.productId.toString === productId &&
+		p.productId === productId &&
 			(!color || p.color === color) &&
 			(!size || p.size === size);
 	});
@@ -37,16 +39,11 @@ const addToCart = asyncHandler(async (req, res) => {
 		cart.products.push({
 			productId,
 			quantity,
-			priceAtAddition: product.price,
+			priceAtAddition: price,
 			color,
 			size,
 		});
 	}
-
-	cart.totalAmount = cart.products.reduce(
-		(sum, p) => sum + p.quantity * p.priceAtAddition,
-		0
-	);
 
 	await cart.save();
 
@@ -55,6 +52,7 @@ const addToCart = asyncHandler(async (req, res) => {
 		.json(
 			new ApiResponse(
 				200,
+				cart,
 				"Product Added to Cart Successfully"
 			)
 		);
@@ -71,8 +69,8 @@ const getCart = asyncHandler(async (req, res) => {
 			.json(new ApiResponse(200, {}, "Add items to cart"));
 	}
 	return res
-		.json(200)
-		.json(new ApiResponse(200, cart, "Items felt Successfully"));
+		.status(200)
+		.json(new ApiResponse(200, cart, "Items fetched Successfully"));
 });
 
 const updateQuantity = asyncHandler(async (req, res) => {
@@ -98,15 +96,10 @@ const updateQuantity = asyncHandler(async (req, res) => {
 
 	item.quantity = quantity;
 
-	cart.totalAmount = cart.products.reduce(
-		(sum, p) => sum + p.quantity * p.priceAtAddition,
-		0
-	);
-
 	await cart.save();
 	return res
 		.status(200)
-		.jsno(
+		.json(
 			new ApiResponse(
 				200,
 				cart,
