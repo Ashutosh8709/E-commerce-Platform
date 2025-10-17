@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import {
 	Search,
@@ -41,9 +41,12 @@ function Navbar() {
 							<div className="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
 								<Package className="w-5 h-5 text-white" />
 							</div>
-							<span className="text-xl font-bold text-gray-900">
+							<Link
+								to={"/home"}
+								className="text-xl font-bold text-gray-900"
+							>
 								SwiftCart
-							</span>
+							</Link>
 						</div>
 
 						{/* Desktop Navigation */}
@@ -164,7 +167,12 @@ function Navbar() {
 											className="flex items-center gap-2 p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors"
 										>
 											<div className="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center border-2 border-indigo-200">
-												<User className="w-4 h-4 text-white" />
+												<img
+													src={
+														user.avatar
+													}
+													className="w-4 h-4 text-white"
+												/>
 											</div>
 											<ChevronDown
 												className={`w-4 h-4 transition-transform ${
@@ -182,15 +190,23 @@ function Navbar() {
 												<div className="px-4 py-3 border-b border-gray-100">
 													<div className="flex items-center gap-3">
 														<div className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
-															<User className="w-5 h-5 text-white" />
+															<img
+																src={
+																	user.avatar
+																}
+																className="w-5 h-5 text-white"
+															/>
 														</div>
 														<div>
 															<p className="font-medium text-gray-900">
-																John
-																Doe
+																{
+																	user.name
+																}
 															</p>
 															<p className="text-sm text-gray-500">
-																john.doe@example.com
+																{
+																	user.email
+																}
 															</p>
 														</div>
 													</div>

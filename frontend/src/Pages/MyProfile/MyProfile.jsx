@@ -11,6 +11,7 @@ import {
 	ShoppingCart,
 	ChevronDown,
 } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
 
 function MyProfile({
 	onSwitchToLogin,
@@ -20,14 +21,8 @@ function MyProfile({
 }) {
 	const [isProfileOpen, setIsProfileOpen] = useState(false);
 	const [isEditing, setIsEditing] = useState(false);
-	const [profileData, setProfileData] = useState({
-		name: "John Doe",
-		email: "john.doe@example.com",
-		phone: "+1 (555) 123-4567",
-		dateOfBirth: "1990-05-15",
-		gender: "Male",
-		bio: "Passionate about technology and design. Love shopping for the latest gadgets and fashion.",
-	});
+	const { user } = useAuth();
+	const [profileData, setProfileData] = useState(user);
 
 	const handleInputChange = (e) => {
 		const { name, value } = e.target;
@@ -56,7 +51,12 @@ function MyProfile({
 						<div className="absolute -bottom-16 left-8">
 							<div className="relative">
 								<div className="w-32 h-32 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full border-4 border-white flex items-center justify-center shadow-lg">
-									<User className="w-16 h-16 text-white" />
+									<img
+										src={
+											user.avatar
+										}
+										className="w-16 h-16 text-white"
+									/>
 								</div>
 								<button className="absolute bottom-2 right-2 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors">
 									<Camera className="w-5 h-5 text-gray-600" />
