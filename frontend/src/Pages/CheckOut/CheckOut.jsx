@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Package, ShoppingCart, User, Heart, Search } from "lucide-react";
+import { Link } from "react-router-dom";
 
 function CheckoutPage() {
 	const [selectedAddress, setSelectedAddress] = useState("home");
@@ -47,14 +48,12 @@ function CheckoutPage() {
 					<div className="space-y-8">
 						{/* Breadcrumb */}
 						<nav className="flex items-center space-x-2 text-sm">
-							<button
-								// onClick={
-								// 	onSwitchToCart
-								// }
+							<Link
+								to={"/cart"}
 								className="text-gray-500 hover:text-indigo-600 transition-colors"
 							>
 								Cart
-							</button>
+							</Link>
 							<span className="text-gray-300">
 								/
 							</span>

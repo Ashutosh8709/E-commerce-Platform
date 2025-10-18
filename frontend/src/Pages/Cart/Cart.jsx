@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { Plus, Minus, Trash2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 function ShoppingCartPage() {
 	const [isProfileOpen, setIsProfileOpen] = useState(false);
+	const navigate = useNavigate();
 	const [cartItems, setCartItems] = useState([
 		{
 			id: 1,
@@ -303,7 +305,14 @@ function ShoppingCartPage() {
 								</div>
 							</div>
 
-							<button className="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg mt-6 hover:bg-indigo-700 transition-colors shadow-lg hover:shadow-xl">
+							<button
+								onClick={() =>
+									navigate(
+										"/checkout"
+									)
+								}
+								className="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg mt-6 hover:bg-indigo-700 transition-colors shadow-lg hover:shadow-xl"
+							>
 								Proceed to
 								Checkout
 							</button>
