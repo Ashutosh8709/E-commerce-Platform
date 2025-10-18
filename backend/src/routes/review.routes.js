@@ -11,7 +11,7 @@ import { upload } from "../middlewares/multer.middleware.js";
 
 const router = Router();
 
-router.post("/:productId", verifyJwt, addReview);
+router.post("/:productId", verifyJwt, upload.single("reviewImage"), addReview);
 router.get("/:productId", getReviews);
 router.patch("/:productId", verifyJwt, updateReview);
 router.delete("/:productId", verifyJwt, deleteReview);

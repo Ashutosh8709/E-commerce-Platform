@@ -145,7 +145,7 @@ const updateReview = asyncHandler(async (req, res) => {
 
 	return res
 		.status(200)
-		.jsno(
+		.json(
 			new ApiResponse(
 				200,
 				updatedReview,
