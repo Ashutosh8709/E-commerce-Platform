@@ -2,7 +2,7 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export default function ProtectedRoute({ children }) {
-	const { user, loading, userLoggedOut, setUserLoggedOut } = useAuth();
+	const { user, loading, userLoggedOut, setUserLoggedout } = useAuth();
 	if (loading) {
 		return (
 			<div className="flex items-center justify-center h-screen">
@@ -13,7 +13,7 @@ export default function ProtectedRoute({ children }) {
 
 	if (!user) {
 		if (userLoggedOut) {
-			setTimeout(() => setUserLoggedOut(false), 0);
+			setTimeout(() => setUserLoggedout(true), 0);
 			return <Navigate to="/" replace />;
 		}
 		return <Navigate to="/login" replace />;

@@ -8,11 +8,12 @@ import Login from "./Pages/Login/Login.jsx";
 import Signup from "./Pages/Signup/Signup.jsx";
 import ForgotPasswordPage from "./Pages/Login/ForgotPassword.jsx";
 import { AuthContextProvider } from "./context/AuthContext.jsx";
+import { CartContextProvider } from "./context/CartContext.jsx";
+import { WishlistContextProvider } from "./context/WishlistContext.jsx";
 import Home from "./Pages/Home/Home.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import { ToastContainer } from "react-toastify";
 import Cart from "./Pages/Cart/Cart.jsx";
-import Products from "./Pages/Products/Products.jsx";
 import OrderTracking from "./Pages/OrderTracking/OrderTracking.jsx";
 import Checkout from "./Pages/CheckOut/CheckOut.jsx";
 import ProductListing from "./Pages/Products/ProductListing.jsx";
@@ -158,8 +159,12 @@ const router = createBrowserRouter([
 createRoot(document.getElementById("root")).render(
 	<StrictMode>
 		<AuthContextProvider>
-			<RouterProvider router={router} />
-			<ToastContainer />
+			<CartContextProvider>
+				<WishlistContextProvider>
+					<RouterProvider router={router} />
+					<ToastContainer />
+				</WishlistContextProvider>
+			</CartContextProvider>
 		</AuthContextProvider>
 	</StrictMode>
 );

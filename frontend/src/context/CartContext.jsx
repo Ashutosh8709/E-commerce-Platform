@@ -12,8 +12,13 @@ import { useAuth } from "./AuthContext";
 
 const CartContext = createContext();
 
-export const CartProvider = ({ children }) => {
-	const [cart, setCart] = useState([]);
+export const CartContextProvider = ({ children }) => {
+	const [cart, setCart] = useState({
+		discount: 0,
+		totalAmount: 0,
+		promoCode: "",
+		items: [],
+	});
 	const [loading, setLoading] = useState(true);
 	const { user } = useAuth();
 
@@ -21,77 +26,135 @@ export const CartProvider = ({ children }) => {
 		const fetchCart = async () => {
 			try {
 				const res = await get();
-				console.log(res.data);
+				if (res?.data?.data) {
+					setCart({
+						discount:
+							res.data.data
+								.discount || 0,
+						totalAmount:
+							res.data.data
+								.totalAmount ||
+							0,
+						promoCode:
+							res.data.data
+								.promoCode ||
+							"",
+						items:
+							res.data.data
+								.products || [],
+					});
+				} else {
+					setCart({
+						discount: 0,
+						totalAmount: 0,
+						promoCode: "",
+						items: [],
+					});
+				}
 			} catch (error) {
-				setCart([]);
+				console.error("Error fetching cart:", error);
+				setCart({
+					discount: 0,
+					totalAmount: 0,
+					promoCode: "",
+					items: [],
+				});
 			} finally {
 				setLoading(false);
 			}
 		};
+
 		if (user) {
 			fetchCart();
-		} else setCart([]);
-	}, []);
+		} else {
+			setCart({
+				discount: 0,
+				totalAmount: 0,
+				promoCode: "",
+				items: [],
+			});
+			setLoading(false);
+		}
+	}, [user]);
+
+	const updateCartFromResponse = (res) => {
+		if (res?.data?.data) {
+			setCart({
+				discount: res.data.data.discount || 0,
+				totalAmount: res.data.data.totalAmount || 0,
+				promoCode: res.data.data.promoCode || "",
+				items: res.data.data.products || [],
+			});
+		}
+	};
 
 	const addToCart = async (productData) => {
 		const { productId, quantity, color, size } = productData;
 		try {
 			const res = await add(productId, quantity, color, size);
-			console.log(res.data);
+			updateCartFromResponse(res);
 			handleSuccess("Product Added To Cart");
 		} catch (error) {
-			const message =
+			handleError(
 				error?.response?.data?.message ||
-				"Something went wrong";
-			handleError(message);
+					"Something went wrong"
+			);
 		}
 	};
 
 	const updateQuantity = async (productId, quantity) => {
 		try {
 			const res = await updateQuan(productId, quantity);
+			updateCartFromResponse(res);
 		} catch (error) {
-			const message =
+			handleError(
 				error?.response?.data?.message ||
-				"Something went wrong";
-			handleError(message);
+					"Something went wrong"
+			);
 		}
 	};
 
 	const removeItem = async (productId) => {
 		try {
 			const res = await remove(productId);
-			console.log("Item Removed Successfully");
+			updateCartFromResponse(res);
+			handleSuccess("Item Removed Successfully");
 		} catch (error) {
-			const message =
+			handleError(
 				error?.response?.data?.message ||
-				"Something went wrong";
-			handleError(message);
+					"Something went wrong"
+			);
 		}
 	};
 
 	const clearCart = async () => {
 		try {
 			await clear();
-			setCart([]);
+			setCart({
+				discount: 0,
+				totalAmount: 0,
+				promoCode: "",
+				items: [],
+			});
 			handleSuccess("Cart cleared");
 		} catch (error) {
-			const message =
+			handleError(
 				error?.response?.data?.message ||
-				"Something went wrong";
-			handleError(message);
+					"Something went wrong"
+			);
 		}
 	};
 
 	const saveForLater = async (productId) => {
 		try {
 			const res = await save(productId);
+			updateCartFromResponse(res);
 			handleSuccess("Item saved for later");
 		} catch (error) {
-			const message =
+			handleError(
 				error?.response?.data?.message ||
-				"Something went wrong";
-			handleError(message);
+					"Something went wrong"
+			);
 		}
 	};
 

@@ -1,4 +1,4 @@
-import { useContext, createContext, Children, useState } from "react";
+import { useContext, createContext, useState } from "react";
 import { handleError, handleSuccess } from "../utils";
 import { add, get, remove, clear, addCart } from "../services/wishlistService";
 import { useAuth } from "./AuthContext";
@@ -6,7 +6,7 @@ import { useEffect } from "react";
 
 const WishListContext = createContext();
 
-export const WishlistProvider = ({ children }) => {
+export const WishlistContextProvider = ({ children }) => {
 	const [wishlist, setWishlist] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const { user } = useAuth();
@@ -15,7 +15,7 @@ export const WishlistProvider = ({ children }) => {
 		const fetchWishlist = async () => {
 			try {
 				const res = await get();
-				console.log(res.data);
+				setWishlist(res.data?.data.products);
 			} catch (error) {
 				setWishlist([]);
 			} finally {
@@ -26,13 +26,15 @@ export const WishlistProvider = ({ children }) => {
 			fetchWishlist();
 		} else {
 			setWishlist([]);
+			setLoading(false);
 		}
-	}, []);
+	}, [user]);
 
 	const addToWishlist = async (wishlistData) => {
 		const { productId, color, size } = wishlistData;
 		try {
 			const res = await add(productId, color, size);
+			setWishlist(res.data?.data?.products);
 			handleSuccess("Product added to wishlist");
 		} catch (error) {
 			const message =
@@ -45,6 +47,7 @@ export const WishlistProvider = ({ children }) => {
 	const removeFromWishlist = async (productId) => {
 		try {
 			const res = await remove(productId);
+			setWishlist(res.data?.data?.products);
 			handleSuccess("Product Removed From Wishlist");
 		} catch (error) {
 			const message =
@@ -70,6 +73,7 @@ export const WishlistProvider = ({ children }) => {
 	const addToCart = async (productId) => {
 		try {
 			const res = await addCart(productId);
+
 			handleSuccess("Product Added to Cart");
 		} catch (error) {
 			const message =
