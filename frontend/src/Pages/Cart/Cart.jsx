@@ -1,39 +1,19 @@
 import React, { useState } from "react";
 import { Plus, Minus, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useCart } from "../../context/CartContext";
 
 function ShoppingCartPage() {
 	const [isProfileOpen, setIsProfileOpen] = useState(false);
 	const navigate = useNavigate();
-	const [cartItems, setCartItems] = useState([
-		{
-			id: 1,
-			name: "Premium Cotton T-Shirt",
-			size: "M",
-			color: "Blue",
-			price: 30.0,
-			quantity: 2,
-			image: "https://images.pexels.com/photos/1656684/pexels-photo-1656684.jpeg?auto=compress&cs=tinysrgb&w=400",
-		},
-		{
-			id: 2,
-			name: "Running Shoes",
-			size: "8",
-			color: "Black",
-			price: 80.0,
-			quantity: 1,
-			image: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=400",
-		},
-		{
-			id: 3,
-			name: "Leather Backpack",
-			size: "One Size",
-			color: "Brown",
-			price: 120.0,
-			quantity: 1,
-			image: "https://images.pexels.com/photos/1152077/pexels-photo-1152077.jpeg?auto=compress&cs=tinysrgb&w=400",
-		},
-	]);
+	const {
+		cart,
+		loading,
+		updateQuantity,
+		removeItem,
+		clearCart,
+		saveForLater,
+	} = useCart();
 
 	const [wishlistItems] = useState([
 		{
@@ -45,28 +25,9 @@ function ShoppingCartPage() {
 		},
 	]);
 
-	const updateQuantity = (id, newQuantity) => {
-		if (newQuantity < 1) return;
-		setCartItems((items) =>
-			items.map((item) =>
-				item.id === id
-					? { ...item, quantity: newQuantity }
-					: item
-			)
-		);
-	};
-
-	const removeItem = (id) => {
-		setCartItems((items) => items.filter((item) => item.id !== id));
-	};
-
-	const subtotal = cartItems.reduce(
-		(sum, item) => sum + item.price * item.quantity,
-		0
-	);
 	const shipping = 10.0;
-	const discount = 20.0;
-	const total = subtotal + shipping - discount;
+	const discount = cart.discount;
+	const total = cart.totalAmount + shipping - discount;
 
 	return (
 		<div className="min-h-screen bg-gray-50">
@@ -78,20 +39,21 @@ function ShoppingCartPage() {
 						<h1 className="text-3xl font-bold text-gray-900 mb-6">
 							Shopping Cart
 						</h1>
-
 						<div className="bg-white rounded-lg shadow-sm border border-gray-200">
-							{cartItems.map(
+							{cart.items.map(
 								(
 									item,
 									index
 								) => (
 									<div
 										key={
-											item.id
+											item._id
 										}
 										className={`p-6 ${
 											index !==
-											cartItems.length -
+											cart
+												.items
+												.length -
 												1
 												? "border-b border-gray-200"
 												: ""
@@ -131,7 +93,7 @@ function ShoppingCartPage() {
 													<button
 														onClick={() =>
 															updateQuantity(
-																item.id,
+																item.productId,
 																item.quantity -
 																	1
 															)
@@ -148,7 +110,7 @@ function ShoppingCartPage() {
 													<button
 														onClick={() =>
 															updateQuantity(
-																item.id,
+																item.productId,
 																item.quantity +
 																	1
 															)
@@ -164,7 +126,7 @@ function ShoppingCartPage() {
 												<p className="font-semibold text-lg text-gray-900">
 													$
 													{(
-														item.price *
+														item.priceAtAddition *
 														item.quantity
 													).toFixed(
 														2
@@ -173,7 +135,7 @@ function ShoppingCartPage() {
 												<button
 													onClick={() =>
 														removeItem(
-															item.id
+															item.productId
 														)
 													}
 													className="text-xs text-red-500 hover:text-red-700 mt-2 flex items-center gap-1"
@@ -187,8 +149,7 @@ function ShoppingCartPage() {
 								)
 							)}
 						</div>
-
-						{/* Wishlist */}
+						Wishlist
 						<h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">
 							Your Wishlist
 						</h2>
@@ -262,7 +223,7 @@ function ShoppingCartPage() {
 									</span>
 									<span className="font-medium text-gray-900">
 										$
-										{subtotal.toFixed(
+										{cart.totalAmount.toFixed(
 											2
 										)}
 									</span>

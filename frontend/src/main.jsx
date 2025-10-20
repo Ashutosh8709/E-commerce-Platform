@@ -22,7 +22,6 @@ import HelpSupport from "./Pages/HelpSupport/HelpSupport.jsx";
 import MyOrders from "./Pages/MyOrders/MyOrders.jsx";
 import MyProfile from "./Pages/MyProfile/MyProfile.jsx";
 import PaymentMethods from "./Pages/PaymentMethods/PaymentMethods.jsx";
-
 import Wishlist from "./Pages/Wishlist/Wishlist.jsx";
 import SettingsPage from "./Pages/Settings/SettingsPage.jsx";
 import DealsNewArrivalsPage from "./Pages/Deals/Deals.jsx";
@@ -153,6 +152,10 @@ const router = createBrowserRouter([
 	{
 		path: "/forgot-password",
 		element: <ForgotPasswordPage />,
+	},
+	{
+		path: "/track",
+		element: <OrderTracking />,
 	},
 ]);
 

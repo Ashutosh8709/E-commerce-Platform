@@ -12,32 +12,43 @@ const addToCart = asyncHandler(async (req, res) => {
 	// if same product already exists then add quantity
 	// otherwise create add new product
 	const { productId } = req.params;
-	const { quantity, color, size } = req.body;
+	const { quantity = 1, color, size } = req.body;
 	const userId = req.user?._id;
 
+	if (!userId) {
+		throw new ApiError(401, "Unauthorized Access");
+	}
+
 	const product = await Product.findById(productId);
+
 	if (!product) {
 		throw new ApiError(404, "Product not Found");
 	}
 
 	const price = product.offeredPrice;
+	const name = product.name;
+	const image = product?.productImage;
 
 	let cart = await Cart.findOne({ owner: userId });
+
 	if (!cart) {
 		cart = new Cart({ owner: userId, products: [] });
 	}
 
-	const existingProduct = cart.products.find((p) => {
-		p.productId === productId &&
+	const existingProduct = cart.products.find(
+		(p) =>
+			p.productId.toString() === productId &&
 			(!color || p.color === color) &&
-			(!size || p.size === size);
-	});
+			(!size || p.size === size)
+	);
 
 	if (existingProduct) {
 		existingProduct.quantity += quantity;
 	} else {
 		cart.products.push({
 			productId,
+			name,
+			image,
 			quantity,
 			priceAtAddition: price,
 			color,
@@ -122,10 +133,6 @@ const removeItem = asyncHandler(async (req, res) => {
 	if (!cart) {
 		throw new ApiError(404, "No Cart Found");
 	}
-	cart.totalAmount = cart.products.reduce(
-		(sum, p) => sum + p.quantity * p.priceAtAddition,
-		0
-	);
 
 	await cart.save();
 
@@ -178,10 +185,6 @@ const savedForLater = asyncHandler(async (req, res) => {
 		throw new ApiError(404, "Cart not Found");
 	}
 
-	cart.totalAmount = cart.products.reduce(
-		(sum, p) => sum + p.quantity * p.priceAtAddition,
-		0
-	);
 	await cart.save();
 
 	return res
