@@ -23,7 +23,14 @@ export const AuthContextProvider = ({ children }) => {
 				setUser(res.data.data);
 				setUserLoggedout(false);
 			} catch (error) {
-				setUser(null);
+				if (error.response?.status === 401) {
+					setUser(null);
+				} else {
+					console.error(
+						"Error fetching user:",
+						error.message
+					);
+				}
 			} finally {
 				setLoading(false);
 			}
@@ -35,7 +42,7 @@ export const AuthContextProvider = ({ children }) => {
 		const { email, password } = formData;
 		try {
 			const res = await loginUser(email, password);
-			setUser(res.data.data);
+			setUser(res.data?.data);
 			setUserLoggedout(false);
 			handleSuccess(res.data.message);
 		} catch (error) {

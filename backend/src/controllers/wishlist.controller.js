@@ -88,7 +88,13 @@ const removeFromWishlist = asyncHandler(async (req, res) => {
 
 	return res
 		.status(200)
-		.json(new ApiResponse(200, {}, "Product Removed Successfully"));
+		.json(
+			new ApiResponse(
+				200,
+				updatedWishlist,
+				"Product Removed Successfully"
+			)
+		);
 });
 
 const addToCart = asyncHandler(async (req, res) => {
@@ -114,6 +120,9 @@ const addToCart = asyncHandler(async (req, res) => {
 	const product = await Product.findById(productId);
 	if (!product) throw new ApiError(404, "Product does not exist anymore");
 
+	const name = product.name;
+	const image = product.productImage;
+
 	let cart = await Cart.findOne({ owner: userId });
 	if (!cart) {
 		cart = new Cart({ owner: userId, products: [] });
@@ -128,6 +137,8 @@ const addToCart = asyncHandler(async (req, res) => {
 
 	cart.products.push({
 		productId,
+		name,
+		image,
 		quantity: productInWishlist.quantity || 1,
 		priceAtAddition: product.offeredPrice,
 		color: productInWishlist.color,
@@ -182,7 +193,50 @@ const getWishlist = asyncHandler(async (req, res) => {
 		throw new ApiError(401, "Unauthorized Access");
 	}
 
-	const wishlist = await Wishlist.findOne({ owner: userId });
+	const wishlist = await Wishlist.aggregate([
+		{ $match: { owner: userId } },
+		{ $unwind: "$products" },
+		{
+			$lookup: {
+				from: "products",
+				localField: "products.productId",
+				foreignField: "_id",
+				as: "productDetails",
+			},
+		},
+		{ $unwind: "$productDetails" },
+		{
+			$addFields: {
+				"products.name": "$productDetails.name",
+				"products.image":
+					"$productDetails.productImage",
+				"products.originalPrice":
+					"$productDetails.originalPrice",
+				"products.offeredPrice":
+					"$productDetails.offeredPrice",
+				"products.stock": {
+					$cond: {
+						if: {
+							$gt: [
+								"$productDetails.stock",
+								0,
+							],
+						},
+						then: true,
+						else: false,
+					},
+				},
+			},
+		},
+		{
+			$group: {
+				_id: "$_id",
+				owner: { $first: "$owner" },
+				products: { $push: "$products" },
+			},
+		},
+	]);
+
 	if (!wishlist) {
 		throw new ApiError(400, "Wishlist not found");
 	}

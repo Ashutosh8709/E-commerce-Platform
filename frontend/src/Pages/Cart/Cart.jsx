@@ -25,7 +25,7 @@ function ShoppingCartPage() {
 		},
 	]);
 
-	const shipping = 10.0;
+	const shipping = cart.items.length > 0 ? 10.0 : 0;
 	const discount = cart.discount;
 	const total = cart.totalAmount + shipping - discount;
 
@@ -36,9 +36,19 @@ function ShoppingCartPage() {
 				<div className="grid lg:grid-cols-3 gap-8">
 					{/* Cart Items */}
 					<div className="lg:col-span-2">
-						<h1 className="text-3xl font-bold text-gray-900 mb-6">
-							Shopping Cart
-						</h1>
+						<div className="flex items-center justify-between mb-6">
+							<h1 className="text-3xl font-bold text-gray-900">
+								Shopping Cart
+							</h1>
+							<button
+								onClick={() =>
+									clearCart()
+								}
+								className="bg-red-600 text-white font-bold py-3 px-4 rounded-lg mt-6 hover:bg-red-700 transition-colors shadow-lg hover:shadow-xl"
+							>
+								Clear Cart
+							</button>
+						</div>
 						<div className="bg-white rounded-lg shadow-sm border border-gray-200">
 							{cart.items.map(
 								(
@@ -149,7 +159,7 @@ function ShoppingCartPage() {
 								)
 							)}
 						</div>
-						Wishlist
+
 						<h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">
 							Your Wishlist
 						</h2>

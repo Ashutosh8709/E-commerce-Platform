@@ -93,7 +93,7 @@ export const CartContextProvider = ({ children }) => {
 		try {
 			const res = await add(productId, quantity, color, size);
 			updateCartFromResponse(res);
-			handleSuccess("Product Added To Cart");
+			handleSuccess(res.data.message);
 		} catch (error) {
 			handleError(
 				error?.response?.data?.message ||
@@ -118,7 +118,7 @@ export const CartContextProvider = ({ children }) => {
 		try {
 			const res = await remove(productId);
 			updateCartFromResponse(res);
-			handleSuccess("Item Removed Successfully");
+			handleSuccess(res.data.message);
 		} catch (error) {
 			handleError(
 				error?.response?.data?.message ||
@@ -129,14 +129,14 @@ export const CartContextProvider = ({ children }) => {
 
 	const clearCart = async () => {
 		try {
-			await clear();
+			let res = await clear();
 			setCart({
 				discount: 0,
 				totalAmount: 0,
 				promoCode: "",
 				items: [],
 			});
-			handleSuccess("Cart cleared");
+			handleSuccess(res.data.message);
 		} catch (error) {
 			handleError(
 				error?.response?.data?.message ||
@@ -149,7 +149,7 @@ export const CartContextProvider = ({ children }) => {
 		try {
 			const res = await save(productId);
 			updateCartFromResponse(res);
-			handleSuccess("Item saved for later");
+			handleSuccess(res.data.message);
 		} catch (error) {
 			handleError(
 				error?.response?.data?.message ||
@@ -164,6 +164,7 @@ export const CartContextProvider = ({ children }) => {
 				cart,
 				loading,
 				addToCart,
+				setCart,
 				updateQuantity,
 				removeItem,
 				clearCart,
