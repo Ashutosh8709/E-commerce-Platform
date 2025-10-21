@@ -12,6 +12,7 @@ import {
 	ChevronDown,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import { useWishlist } from "../../context/WishlistContext";
 
 function MyProfile({
 	onSwitchToLogin,
@@ -23,6 +24,7 @@ function MyProfile({
 	const [isEditing, setIsEditing] = useState(false);
 	const { user } = useAuth();
 	const [profileData, setProfileData] = useState(user);
+	const { wishlist } = useWishlist();
 
 	const handleInputChange = (e) => {
 		const { name, value } = e.target;
@@ -312,7 +314,10 @@ function MyProfile({
 								</div>
 								<div className="bg-purple-50 rounded-lg p-6 text-center">
 									<div className="text-3xl font-bold text-purple-600">
-										12
+										{wishlist ===
+										undefined
+											? 0
+											: wishlist.length}
 									</div>
 									<div className="text-sm text-gray-600 mt-1">
 										Wishlist
