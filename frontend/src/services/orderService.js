@@ -1,10 +1,16 @@
 import api from "./api";
 
-export const getUserOrders = () => {};
+export const getUserOrders = () => {
+	return api.get("/order/user");
+};
 
-export const getById = () => {};
+export const getById = (id) => {
+	return api.post(`/order${id}`);
+};
 
-export const cancel = () => {};
+export const cancel = (id) => {
+	return api.patch(`/order/${id}/cancel`);
+};
 
 export const updateStatus = () => {};
 

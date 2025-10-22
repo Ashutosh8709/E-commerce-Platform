@@ -20,12 +20,13 @@ import {
 import { Link, NavLink } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useCart } from "../../context/CartContext";
 
 function Navbar() {
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const [isProfileOpen, setIsProfileOpen] = useState(false);
 	const { user, logout } = useAuth();
-	const navigate = useNavigate();
+	const { cart } = useCart();
 
 	const handleLogout = async () => {
 		await logout();
@@ -167,7 +168,11 @@ function Navbar() {
 									>
 										<ShoppingCart className="w-5 h-5" />
 										<span className="absolute -top-1 -right-1 w-5 h-5 bg-indigo-600 text-white text-xs rounded-full flex items-center justify-center">
-											3
+											{
+												cart
+													.items
+													.length
+											}
 										</span>
 									</NavLink>
 

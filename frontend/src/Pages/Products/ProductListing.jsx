@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
 	Search,
 	Heart,
@@ -10,6 +10,7 @@ import {
 	ChevronLeft,
 	ChevronRight,
 } from "lucide-react";
+import { get } from "../../services/productService";
 
 function ProductListing() {
 	const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -19,6 +20,10 @@ function ProductListing() {
 	const [priceRange, setPriceRange] = useState(250);
 	const [viewMode, setViewMode] = useState("grid");
 	const [sortBy, setSortBy] = useState("featured");
+	const [products, setProducts] = useState([]);
+	const [page, setPage] = useState(1);
+	const [totalPages, setTotalPages] = useState(1);
+	const limit = 8;
 
 	const categories = [
 		"Clothing",
@@ -38,71 +43,37 @@ function ProductListing() {
 
 	const sizes = ["XS", "S", "M", "L", "XL"];
 
-	const products = [
-		{
-			id: 1,
-			name: "Elegant Black Dress",
-			price: 79.99,
-			image: "https://images.pexels.com/photos/1536619/pexels-photo-1536619.jpeg?auto=compress&cs=tinysrgb&w=400",
-			category: "Clothing",
-		},
-		{
-			id: 2,
-			name: "Casual Denim Jacket",
-			price: 59.99,
-			image: "https://images.pexels.com/photos/1124465/pexels-photo-1124465.jpeg?auto=compress&cs=tinysrgb&w=400",
-			category: "Clothing",
-		},
-		{
-			id: 3,
-			name: "Leather Ankle Boots",
-			price: 129.99,
-			image: "https://images.pexels.com/photos/1598505/pexels-photo-1598505.jpeg?auto=compress&cs=tinysrgb&w=400",
-			category: "Shoes",
-		},
-		{
-			id: 4,
-			name: "Stylish Handbag",
-			price: 89.99,
-			image: "https://images.pexels.com/photos/1152077/pexels-photo-1152077.jpeg?auto=compress&cs=tinysrgb&w=400",
-			category: "Bags",
-		},
-		{
-			id: 5,
-			name: "Silver Hoop Earrings",
-			price: 29.99,
-			image: "https://images.pexels.com/photos/1191531/pexels-photo-1191531.jpeg?auto=compress&cs=tinysrgb&w=400",
-			category: "Jewelry",
-		},
-		{
-			id: 6,
-			name: "Classic White Sneakers",
-			price: 69.99,
-			image: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=400",
-			category: "Shoes",
-		},
-		{
-			id: 7,
-			name: "Cozy Knit Sweater",
-			price: 49.99,
-			image: "https://images.pexels.com/photos/1536619/pexels-photo-1536619.jpeg?auto=compress&cs=tinysrgb&w=400",
-			category: "Clothing",
-		},
-		{
-			id: 8,
-			name: "Statement Necklace",
-			price: 39.99,
-			image: "https://images.pexels.com/photos/1191531/pexels-photo-1191531.jpeg?auto=compress&cs=tinysrgb&w=400",
-			category: "Jewelry",
-		},
-	];
-
 	const handleCategoryChange = (category) => {
 		setSelectedCategory((prev) =>
 			prev.includes(category)
 				? prev.filter((c) => c !== category)
 				: [...prev, category]
 		);
+	};
+
+	// 🧠 Fetch Products with Pagination
+	const fetchProducts = async (currentPage = 1) => {
+		try {
+			const response = await get(currentPage, limit);
+			setProducts(response.data?.data?.products);
+			setTotalPages(
+				response.data?.data?.pagination?.totalPages || 1
+			);
+		} catch (error) {
+			console.error("Error fetching products:", error);
+		}
+	};
+
+	useEffect(() => {
+		fetchProducts(page);
+	}, [page]);
+
+	const handleNextPage = () => {
+		if (page < totalPages) setPage(page + 1);
+	};
+
+	const handlePrevPage = () => {
+		if (page > 1) setPage(page - 1);
 	};
 
 	return (
@@ -306,35 +277,19 @@ function ProductListing() {
 
 					{/* Main Content */}
 					<div className="flex-1">
-						{/* Mobile Search */}
-						<div className="lg:hidden mb-6">
-							<div className="relative">
-								<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-								<input
-									type="text"
-									placeholder="Search for products"
-									className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-								/>
-							</div>
-						</div>
-
 						{/* Toolbar */}
 						<div className="flex items-center justify-between mb-6">
 							<div className="flex items-center gap-4">
-								<button className="lg:hidden flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-									<Filter className="w-4 h-4" />
-									Filters
-								</button>
 								<p className="text-sm text-gray-600">
-									Showing
-									1-8 of
-									24
-									results
+									Showing{" "}
+									{
+										products.length
+									}{" "}
+									products
 								</p>
 							</div>
 
 							<div className="flex items-center gap-4">
-								{/* Sort Dropdown */}
 								<select
 									value={
 										sortBy
@@ -369,8 +324,6 @@ function ProductListing() {
 										Newest
 									</option>
 								</select>
-
-								{/* View Toggle */}
 								<div className="flex border border-gray-300 rounded-lg overflow-hidden">
 									<button
 										onClick={() =>
@@ -419,14 +372,14 @@ function ProductListing() {
 								(product) => (
 									<div
 										key={
-											product.id
+											product._id
 										}
 										className="group bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow duration-300"
 									>
 										<div className="relative overflow-hidden">
 											<img
 												src={
-													product.image
+													product.productImage
 												}
 												alt={
 													product.name
@@ -434,8 +387,6 @@ function ProductListing() {
 												className="w-full aspect-[3/4] object-cover transition-transform duration-300 group-hover:scale-105"
 											/>
 											<div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-
-											{/* Quick Actions */}
 											<div className="absolute top-4 right-4 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
 												<button className="w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-gray-600 hover:text-red-500 transition-colors">
 													<Heart className="w-4 h-4" />
@@ -453,14 +404,14 @@ function ProductListing() {
 												}
 											</h4>
 											<p className="text-indigo-600 font-bold">
-												$
+												₹
 												{
-													product.price
+													product.offeredPrice
 												}
 											</p>
 											<p className="text-xs text-gray-500 mt-1">
 												{
-													product.category
+													product.brand
 												}
 											</p>
 										</div>
@@ -470,28 +421,35 @@ function ProductListing() {
 						</div>
 
 						{/* Pagination */}
-						<div className="flex items-center justify-center mt-8 gap-2">
-							<button className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-indigo-600 transition-colors">
+						<div className="flex items-center justify-center mt-8 gap-4">
+							<button
+								onClick={
+									handlePrevPage
+								}
+								disabled={
+									page ===
+									1
+								}
+								className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-indigo-600 transition-colors disabled:opacity-50"
+							>
 								<ChevronLeft className="w-5 h-5" />
 							</button>
 
-							<button className="w-10 h-10 flex items-center justify-center bg-indigo-600 text-white rounded-full font-medium">
-								1
-							</button>
-							<button className="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
-								2
-							</button>
-							<button className="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
-								3
-							</button>
-							<button className="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
-								4
-							</button>
-							<button className="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
-								5
-							</button>
+							<span className="text-sm font-medium text-gray-700">
+								Page {page} of{" "}
+								{totalPages}
+							</span>
 
-							<button className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-indigo-600 transition-colors">
+							<button
+								onClick={
+									handleNextPage
+								}
+								disabled={
+									page ===
+									totalPages
+								}
+								className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-indigo-600 transition-colors disabled:opacity-50"
+							>
 								<ChevronRight className="w-5 h-5" />
 							</button>
 						</div>
@@ -499,7 +457,6 @@ function ProductListing() {
 				</div>
 			</div>
 
-			{/* Click outside to close dropdown */}
 			{isProfileOpen && (
 				<div
 					className="fixed inset-0 z-40"
@@ -518,7 +475,6 @@ function ProductListing() {
 					border: 2px solid #ffffff;
 					box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 				}
-
 				.slider::-moz-range-thumb {
 					height: 20px;
 					width: 20px;

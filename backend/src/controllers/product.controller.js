@@ -227,20 +227,37 @@ const getProductById = asyncHandler(async (req, res) => {
 });
 
 const getProducts = asyncHandler(async (req, res) => {
-	const products = await Product.find({});
-	if (!products || !products.length === 0) {
-		throw new ApiError(400, "No Product Available");
-	}
+	const page = parseInt(req.query.page) || 1;
+	const limit = parseInt(req.query.limit) || 10;
 
-	return res
-		.status(200)
-		.json(
-			new ApiResponse(
-				200,
+	const skip = (page - 1) * limit;
+
+	const products = await Product.find({})
+		.skip(skip)
+		.limit(limit)
+		.sort({ createdAt: -1 });
+
+	const totalProducts = await Product.countDocuments();
+
+	const totalPages = Math.ceil(totalProducts / limit);
+
+	return res.status(200).json(
+		new ApiResponse(
+			200,
+			{
 				products,
-				"Products Fetched Successfully"
-			)
-		);
+				pagination: {
+					totalProducts,
+					totalPages,
+					currentPage: page,
+					limit,
+					hasNextPage: page < totalPages,
+					hasPrevPage: page > 1,
+				},
+			},
+			"Products fetched successfully"
+		)
+	);
 });
 
 const getProductsByCategory = asyncHandler(async (req, res) => {
