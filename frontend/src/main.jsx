@@ -25,6 +25,7 @@ import PaymentMethods from "./Pages/PaymentMethods/PaymentMethods.jsx";
 import Wishlist from "./Pages/Wishlist/Wishlist.jsx";
 import SettingsPage from "./Pages/Settings/SettingsPage.jsx";
 import DealsNewArrivalsPage from "./Pages/Deals/Deals.jsx";
+import ProductDetailPage from "./Pages/Products/Products.jsx";
 
 const router = createBrowserRouter([
 	{
@@ -52,6 +53,14 @@ const router = createBrowserRouter([
 				),
 			},
 			{
+				path: "product/:id",
+				element: (
+					<ProtectedRoute>
+						<ProductDetailPage />
+					</ProtectedRoute>
+				),
+			},
+			{
 				path: "/products",
 				element: (
 					<ProtectedRoute>
@@ -60,7 +69,7 @@ const router = createBrowserRouter([
 				),
 			},
 			{
-				path: "/order-track",
+				path: "/order-track/:id",
 				element: (
 					<ProtectedRoute>
 						<OrderTracking />
@@ -152,10 +161,6 @@ const router = createBrowserRouter([
 	{
 		path: "/forgot-password",
 		element: <ForgotPasswordPage />,
-	},
-	{
-		path: "/track",
-		element: <OrderTracking />,
 	},
 ]);
 

@@ -1,8 +1,18 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Package, Shield, Clock } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 function LandingPage() {
+	const { user } = useAuth();
+	const navigate = useNavigate();
+
+	useEffect(() => {
+		if (user) {
+			navigate("/home");
+		}
+	}, [user, navigate]);
+
 	return (
 		<div className="min-h-screen bg-white">
 			<section className="relative min-h-[600px] bg-gradient-to-br from-slate-700 via-slate-600 to-slate-800 flex items-center justify-center overflow-hidden">

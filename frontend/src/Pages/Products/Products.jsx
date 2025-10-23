@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
 	ArrowLeft,
 	Star,
@@ -7,18 +7,28 @@ import {
 	Plus,
 	Minus,
 } from "lucide-react";
+import { useParams } from "react-router-dom";
+import { getById } from "../../services/productService";
 
 function ProductDetailPage() {
-	const [selectedImage, setSelectedImage] = useState(0);
+	const [productDetails, setProductDetails] = useState({});
 	const [quantity, setQuantity] = useState(1);
 	const [isProfileOpen, setIsProfileOpen] = useState(false);
+	const { id } = useParams();
 
-	const productImages = [
-		"https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg?auto=compress&cs=tinysrgb&w=600",
-		"https://images.pexels.com/photos/1649771/pexels-photo-1649771.jpeg?auto=compress&cs=tinysrgb&w=600",
-		"https://images.pexels.com/photos/1649772/pexels-photo-1649772.jpeg?auto=compress&cs=tinysrgb&w=600",
-	];
-
+	const fetchDetails = async (id) => {
+		try {
+			const res = await getById(id);
+			setProductDetails(res.data?.data);
+		} catch (error) {
+			console.error("Error fetching product details:", error);
+		}
+	};
+	useEffect(() => {
+		if (id) {
+			fetchDetails(id);
+		}
+	}, [id]);
 	const relatedProducts = [
 		{
 			id: 1,
@@ -82,9 +92,7 @@ function ProductDetailPage() {
 						<div className="aspect-square w-full rounded-xl overflow-hidden bg-gray-100">
 							<img
 								src={
-									productImages[
-										selectedImage
-									]
+									productDetails.productImage
 								}
 								alt="Wireless Noise-Canceling Headphones"
 								className="w-full h-full object-cover"
@@ -93,40 +101,15 @@ function ProductDetailPage() {
 
 						{/* Thumbnail Images */}
 						<div className="grid grid-cols-3 gap-4">
-							{productImages.map(
-								(
-									image,
-									index
-								) => (
-									<button
-										key={
-											index
-										}
-										onClick={() =>
-											setSelectedImage(
-												index
-											)
-										}
-										className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${
-											selectedImage ===
-											index
-												? "border-indigo-500 ring-2 ring-indigo-200"
-												: "border-gray-200 hover:border-gray-300"
-										}`}
-									>
-										<img
-											src={
-												image
-											}
-											alt={`Product view ${
-												index +
-												1
-											}`}
-											className="w-full h-full object-cover"
-										/>
-									</button>
-								)
-							)}
+							<img
+								src={
+									productDetails.productImage
+								}
+								alt={
+									"Product view"
+								}
+								className="w-full h-full object-cover"
+							/>
 						</div>
 					</div>
 
@@ -149,8 +132,7 @@ function ProductDetailPage() {
 
 						{/* Product Title */}
 						<h1 className="text-3xl lg:text-4xl font-bold text-gray-900">
-							Wireless Noise-Canceling
-							Headphones
+							{productDetails.name}
 						</h1>
 
 						{/* Rating */}
@@ -182,30 +164,24 @@ function ProductDetailPage() {
 
 						{/* Description */}
 						<p className="text-gray-600 leading-relaxed">
-							Experience immersive
-							sound with our wireless
-							noise-canceling
-							headphones. Featuring
-							advanced noise
-							cancellation technology,
-							crystal-clear audio, and
-							a comfortable design,
-							these headphones are
-							perfect for music lovers
-							and professionals alike.
-							Enjoy up to 20 hours of
-							battery life and
-							seamless Bluetooth
-							connectivity.
+							{
+								productDetails.description
+							}
 						</p>
 
 						{/* Price */}
 						<div className="flex items-baseline gap-4">
 							<span className="text-4xl font-bold text-indigo-600">
-								$199.99
+								&#8377;
+								{
+									productDetails.offeredPrice
+								}
 							</span>
 							<span className="text-xl text-gray-400 line-through">
-								$249.99
+								&#8377;
+								{
+									productDetails.originalPrice
+								}
 							</span>
 						</div>
 

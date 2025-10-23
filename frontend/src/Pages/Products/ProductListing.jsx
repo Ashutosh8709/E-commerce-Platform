@@ -10,6 +10,7 @@ import {
 	ChevronLeft,
 	ChevronRight,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 import { get } from "../../services/productService";
 
 function ProductListing() {
@@ -370,10 +371,11 @@ function ProductListing() {
 						>
 							{products.map(
 								(product) => (
-									<div
+									<Link
 										key={
 											product._id
 										}
+										to={`/product/${product._id}`}
 										className="group bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow duration-300"
 									>
 										<div className="relative overflow-hidden">
@@ -415,7 +417,7 @@ function ProductListing() {
 												}
 											</p>
 										</div>
-									</div>
+									</Link>
 								)
 							)}
 						</div>
