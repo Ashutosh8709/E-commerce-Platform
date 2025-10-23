@@ -40,14 +40,18 @@ function ShoppingCartPage() {
 							<h1 className="text-3xl font-bold text-gray-900">
 								Shopping Cart
 							</h1>
-							<button
-								onClick={() =>
-									clearCart()
-								}
-								className="bg-red-600 text-white font-bold py-3 px-4 rounded-lg mt-6 hover:bg-red-700 transition-colors shadow-lg hover:shadow-xl"
-							>
-								Clear Cart
-							</button>
+							{cart.items.length >
+								0 && (
+								<button
+									onClick={() =>
+										clearCart()
+									}
+									className="bg-red-600 text-white font-bold py-3 px-4 rounded-lg mt-6 hover:bg-red-700 transition-colors shadow-lg hover:shadow-xl"
+								>
+									Clear
+									Cart
+								</button>
+							)}
 						</div>
 						<div className="bg-white rounded-lg shadow-sm border border-gray-200">
 							{cart.items.map(
@@ -160,7 +164,7 @@ function ShoppingCartPage() {
 							)}
 						</div>
 
-						<h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">
+						{/* <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">
 							Your Wishlist
 						</h2>
 						<div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -216,7 +220,7 @@ function ShoppingCartPage() {
 									</div>
 								)
 							)}
-						</div>
+						</div> */}
 					</div>
 
 					{/* Order Summary */}
