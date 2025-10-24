@@ -4,6 +4,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { Product } from "../models/product.model.js";
 import { Category } from "../models/category.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { client } from "../client.js";
 
 const createProduct = asyncHandler(async (req, res) => {
 	// get user which is seller id from req.user
@@ -209,10 +210,40 @@ const getProductById = asyncHandler(async (req, res) => {
 	if (!productId) {
 		throw new ApiError(400, "Product Id is required");
 	}
+	let cachedProduct;
+	try {
+		cachedProduct = await client.get(`product:${productId}`);
+	} catch (error) {
+		console.error(
+			"Redis unavaialable, continuing without cache:",
+			error.message
+		);
+	}
+	if (cachedProduct) {
+		return res
+			.status(200)
+			.json(
+				new ApiResponse(
+					200,
+					JSON.parse(cachedProduct),
+					"Product fetched from cache"
+				)
+			);
+	}
 
 	const product = await Product.findById(productId);
 	if (!product) {
 		throw new ApiError(400, "Product not found");
+	}
+
+	try {
+		await client.setex(
+			`product:${productId}`,
+			3600,
+			JSON.stringify(product)
+		);
+	} catch (error) {
+		console.error("Redis cache save failed:", error.message);
 	}
 
 	return res
@@ -230,6 +261,29 @@ const getProducts = asyncHandler(async (req, res) => {
 	const page = parseInt(req.query.page) || 1;
 	const limit = parseInt(req.query.limit) || 10;
 
+	const cacheKey = `products:page:${page}:limit:${limit}`;
+	let cachedData;
+	try {
+		cachedData = await client.get(cacheKey);
+	} catch (error) {
+		console.error(
+			"Redis Unavailable, continuing without cache",
+			error.message
+		);
+	}
+
+	if (cachedData) {
+		return res
+			.status(200)
+			.json(
+				new ApiResponse(
+					200,
+					JSON.parse(cachedData),
+					"Data fetched from cache"
+				)
+			);
+	}
+
 	const skip = (page - 1) * limit;
 
 	const products = await Product.find({})
@@ -241,23 +295,33 @@ const getProducts = asyncHandler(async (req, res) => {
 
 	const totalPages = Math.ceil(totalProducts / limit);
 
-	return res.status(200).json(
-		new ApiResponse(
-			200,
-			{
-				products,
-				pagination: {
-					totalProducts,
-					totalPages,
-					currentPage: page,
-					limit,
-					hasNextPage: page < totalPages,
-					hasPrevPage: page > 1,
-				},
-			},
-			"Products fetched successfully"
-		)
-	);
+	const payload = {
+		products,
+		pagination: {
+			totalProducts,
+			totalPages,
+			currentPage: page,
+			limit,
+			hasNextPage: page < totalPages,
+			hasPrevPage: page > 1,
+		},
+	};
+
+	try {
+		await client.setex(cacheKey, 3600, JSON.stringify(payload));
+	} catch (error) {
+		console.error("Redis cache save failed:", error.message);
+	}
+
+	return res
+		.status(200)
+		.json(
+			new ApiResponse(
+				200,
+				payload,
+				"Products fetched successfully"
+			)
+		);
 });
 
 const getProductsByCategory = asyncHandler(async (req, res) => {
@@ -296,6 +360,28 @@ const getProductsByCategory = asyncHandler(async (req, res) => {
 });
 
 const getFeaturedProducts = asyncHandler(async (req, res) => {
+	const cacheKey = "products:featured:list";
+	let cachedFeaturedProduct;
+	try {
+		cachedFeaturedProduct = await client.get(cacheKey);
+	} catch (error) {
+		console.error(
+			"Redis unavailable, continuing without cache:",
+			error.message
+		);
+	}
+	if (cachedFeaturedProduct) {
+		return res
+			.status(200)
+			.json(
+				new ApiResponse(
+					200,
+					JSON.parse(cachedFeaturedProduct),
+					"Products fetched from cache"
+				)
+			);
+	}
+
 	const featuredProducts = await Product.find({ isFeatured: true }).sort({
 		createdAt: -1,
 	});
@@ -304,6 +390,15 @@ const getFeaturedProducts = asyncHandler(async (req, res) => {
 		throw new ApiError(400, "No Featured Product Found");
 	}
 
+	try {
+		await client.setex(
+			"product:featured",
+			3600,
+			JSON.stringify(featuredProducts)
+		);
+	} catch (error) {
+		console.error("Redis cache save failed: ", error.message);
+	}
 	return res
 		.status(200)
 		.json(
