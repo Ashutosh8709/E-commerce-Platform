@@ -135,7 +135,7 @@ function Navbar() {
 								{/* Action Buttons */}
 								<div className="flex items-center gap-2">
 									<NavLink
-										to="/cart"
+										to={`/notifications/${user._id}`}
 										className={({
 											isActive,
 										}) =>
@@ -148,9 +148,7 @@ function Navbar() {
 										}
 									>
 										<Bell className="w-5 h-5" />
-										<span className="absolute -top-1 -right-1 w-5 h-5 bg-indigo-600 text-white text-xs rounded-full flex items-center justify-center">
-											3
-										</span>
+										<span className="absolute -top-0 -right-0 w-3 h-3 bg-indigo-600 text-white text-xs rounded-full flex items-center justify-center"></span>
 									</NavLink>
 
 									<NavLink

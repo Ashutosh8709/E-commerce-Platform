@@ -26,6 +26,7 @@ import Wishlist from "./Pages/Wishlist/Wishlist.jsx";
 import SettingsPage from "./Pages/Settings/SettingsPage.jsx";
 import DealsNewArrivalsPage from "./Pages/Deals/Deals.jsx";
 import ProductDetailPage from "./Pages/Products/Products.jsx";
+import Notification from "./Pages/Notifications/Notifications.jsx";
 
 const router = createBrowserRouter([
 	{
@@ -73,6 +74,14 @@ const router = createBrowserRouter([
 				element: (
 					<ProtectedRoute>
 						<OrderTracking />
+					</ProtectedRoute>
+				),
+			},
+			{
+				path: "/notifications/:id",
+				element: (
+					<ProtectedRoute>
+						<Notification />
 					</ProtectedRoute>
 				),
 			},

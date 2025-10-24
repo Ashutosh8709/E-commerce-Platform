@@ -149,7 +149,7 @@ export default function NotificationsPage() {
 	return (
 		<div className="max-w-5xl mx-auto">
 			<div className="mb-8">
-				<h1 className="text-3xl font-bold text-slate-900 mb-2">
+				<h1 className="text-3xl font-bold text-slate-900 mb-2 mt-4">
 					Notifications
 				</h1>
 				<p className="text-slate-600">
