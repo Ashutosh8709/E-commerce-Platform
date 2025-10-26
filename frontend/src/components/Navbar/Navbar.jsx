@@ -19,9 +19,10 @@ import {
 } from "lucide-react";
 import { Link, NavLink } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { useNavigate } from "react-router-dom";
 import { useCart } from "../../hooks/useCartQuery";
 import { useWishlist } from "../../hooks/useWishlistQuery";
+import { useQueryClient } from "@tanstack/react-query";
+import { get } from "../../services/productService";
 
 function Navbar() {
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -29,9 +30,18 @@ function Navbar() {
 	const { user, logout } = useAuth();
 	const { cart } = useCart();
 	const { prefetchWishlist } = useWishlist();
+	const queryClient = useQueryClient();
 
 	const handleLogout = async () => {
 		await logout();
+	};
+
+	const prefetchProducts = () => {
+		queryClient.prefetchQuery({
+			queryKey: ["products", 1], // first page
+			queryFn: () => get(1, 8), // adjust limit as needed
+			staleTime: 5 * 60 * 1000, // optional
+		});
 	};
 
 	return (
@@ -98,6 +108,9 @@ function Navbar() {
 							</NavLink>
 							<NavLink
 								to="/products"
+								onMouseEnter={
+									prefetchProducts
+								}
 								className={({
 									isActive,
 								}) =>
