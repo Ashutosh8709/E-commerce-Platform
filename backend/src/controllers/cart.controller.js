@@ -277,6 +277,7 @@ const placeOrder = asyncHandler(async (req, res) => {
 		addressId: shippingAddress,
 		status: "placed",
 		paymentStatus: "pending",
+		paymentId: razorpayOrder.id,
 	});
 
 	if (!order) {
