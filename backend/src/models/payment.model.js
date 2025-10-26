@@ -18,11 +18,6 @@ const paymentSchema = new Schema(
 			type: Number,
 			required: true,
 		},
-		method: {
-			type: String,
-			enum: ["Upi", "Card", "NetBanking", "COD"],
-			required: true,
-		},
 		status: {
 			type: String,
 			enum: [

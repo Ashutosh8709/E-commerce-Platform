@@ -49,7 +49,6 @@ const orderSchema = new Schema(
 		paymentId: {
 			type: Schema.Types.ObjectId,
 			ref: "Payment",
-			required: true,
 		},
 		totalAmount: {
 			type: Number,
@@ -73,7 +72,7 @@ const orderSchema = new Schema(
 		deliveryId: {
 			type: Schema.Types.ObjectId,
 			ref: "Delivery",
-			required: true,
+			required: false,
 		},
 		status: {
 			type: String,

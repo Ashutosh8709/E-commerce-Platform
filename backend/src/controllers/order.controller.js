@@ -132,7 +132,12 @@ const cancelOrder = asyncHandler(async (req, res) => {
 
 const updateOrderStatus = asyncHandler(async (req, res) => {});
 
-const getAllOrders = asyncHandler(async (req, res) => {});
+const getAllOrders = asyncHandler(async (req, res) => {
+	// get user details from req.user
+	// check if role is admin
+	// give all orders done till now
+	// need websockets
+});
 
 const getSalesAnalytics = asyncHandler(async (req, res) => {});
 

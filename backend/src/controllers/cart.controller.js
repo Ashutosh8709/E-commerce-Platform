@@ -4,6 +4,10 @@ import { ApiError } from "../utils/ApiError.js";
 import { Cart } from "../models/cart.model.js";
 import { Product } from "../models/product.model.js";
 import { PromoCode } from "../models/promoCode.model.js";
+import { Order } from "../models/order.model.js";
+import { Payment } from "../models/payment.model.js";
+import { getRazorpayInstance } from "../config/razorpay.js";
+import crypto from "crypto";
 
 const addToCart = asyncHandler(async (req, res) => {
 	// take product details from req.body
@@ -249,10 +253,83 @@ const applyPromoCode = asyncHandler(async (req, res) => {
 });
 
 const placeOrder = asyncHandler(async (req, res) => {
+	const razorpay = getRazorpayInstance();
 	const userId = req.user?._id;
-	const { paymentMethod, shippingAddress } = req.body;
+	const { shippingAddress } = req.body;
 	const cart = await Cart.findOne({ owner: userId });
+	if (!cart || cart.products.length === 0)
+		throw new ApiError(400, "Cart Empty");
+
+	let totalAmount = cart.totalAmount;
+
+	const options = {
+		amount: totalAmount * 100,
+		currency: "INR",
+		receipt: `receipt_order_${Date.now()}`,
+	};
+
+	const razorpayOrder = await razorpay.orders.create(options);
+
+	const order = await Order.create({
+		owner: userId,
+		products: cart.products,
+		totalAmount,
+		addressId: shippingAddress,
+		status: "placed",
+		paymentStatus: "pending",
+	});
+
+	if (!order) {
+		throw new ApiError(400, "Order not created");
+	}
+
+	return res.status(200).json(
+		new ApiResponse(200, {
+			orderId: order._id,
+			razorpayOrder,
+		})
+	);
 });
+
+const verifyPayment = asyncHandler(async (req, res) => {
+	const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
+		req.body;
+
+	const generatedSignature = crypto
+		.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+		.update(razorpay_order_id + "|" + razorpay_payment_id)
+		.digest("hex");
+
+	if (generatedSignature !== razorpay_signature)
+		throw new ApiError(400, "Invalid payment signature");
+
+	const order =
+		(await Order.findOne({ paymentId: razorpay_order_id })) ||
+		(await Order.findOne({
+			status: "placed",
+			paymentStatus: "pending",
+		}));
+
+	if (!order) throw new ApiError(400, "Order not found");
+
+	const payment = await Payment.create({
+		orderId: order._id,
+		userId: order.owner,
+		amount: order.finalAmount || order.totalAmount,
+		status: "Completed",
+		transactionId: razorpay_payment_id,
+	});
+
+	order.paymentId = payment._id;
+	order.paymentStatus = "paid";
+	order.status = "confirmed";
+	await order.save();
+
+	return res
+		.status(200)
+		.json(new ApiResponse(200, order, "Payment Verified"));
+});
+
 export {
 	addToCart,
 	getCart,
@@ -262,4 +339,5 @@ export {
 	savedForLater,
 	applyPromoCode,
 	placeOrder,
+	verifyPayment,
 };
