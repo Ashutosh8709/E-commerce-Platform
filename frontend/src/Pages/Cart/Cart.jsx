@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 import { Plus, Minus, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useCart } from "../../context/CartContext";
+import { useCart } from "../../hooks/useCartQuery";
 
 function ShoppingCartPage() {
-	const [isProfileOpen, setIsProfileOpen] = useState(false);
 	const navigate = useNavigate();
+
 	const {
 		cart,
 		loading,
@@ -15,23 +15,14 @@ function ShoppingCartPage() {
 		saveForLater,
 	} = useCart();
 
-	const [wishlistItems] = useState([
-		{
-			id: 4,
-			name: "Elegant Wristwatch",
-			color: "Silver",
-			price: 250.0,
-			image: "https://images.pexels.com/photos/190819/pexels-photo-190819.jpeg?auto=compress&cs=tinysrgb&w=400",
-		},
-	]);
+	if (loading) return <div>Loading cart...</div>;
 
-	const shipping = cart.items.length > 0 ? 10.0 : 0;
-	const discount = cart.discount;
-	const total = cart.totalAmount + shipping - discount;
+	const shipping = cart?.products?.length > 0 ? 10.0 : 0;
+	const discount = cart?.discount;
+	const total = cart?.totalAmount + shipping - discount;
 
 	return (
 		<div className="min-h-screen bg-gray-50">
-			{/* Main Content */}
 			<main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 				<div className="grid lg:grid-cols-3 gap-8">
 					{/* Cart Items */}
@@ -40,7 +31,7 @@ function ShoppingCartPage() {
 							<h1 className="text-3xl font-bold text-gray-900">
 								Shopping Cart
 							</h1>
-							{cart.items.length >
+							{cart.products.length >
 								0 && (
 								<button
 									onClick={() =>
@@ -53,20 +44,21 @@ function ShoppingCartPage() {
 								</button>
 							)}
 						</div>
+
 						<div className="bg-white rounded-lg shadow-sm border border-gray-200">
-							{cart.items.map(
+							{cart.products.map(
 								(
 									item,
 									index
 								) => (
 									<div
 										key={
-											item._id
+											item.productId
 										}
 										className={`p-6 ${
 											index !==
 											cart
-												.items
+												.products
 												.length -
 												1
 												? "border-b border-gray-200"
@@ -107,9 +99,12 @@ function ShoppingCartPage() {
 													<button
 														onClick={() =>
 															updateQuantity(
-																item.productId,
-																item.quantity -
-																	1
+																{
+																	productId: item.productId,
+																	quantity:
+																		item.quantity -
+																		1,
+																}
 															)
 														}
 														className="p-1 rounded text-gray-500 hover:bg-gray-200 transition-colors"
@@ -124,9 +119,12 @@ function ShoppingCartPage() {
 													<button
 														onClick={() =>
 															updateQuantity(
-																item.productId,
-																item.quantity +
-																	1
+																{
+																	productId: item.productId,
+																	quantity:
+																		item.quantity +
+																		1,
+																}
 															)
 														}
 														className="p-1 rounded text-gray-500 hover:bg-gray-200 transition-colors"
@@ -146,81 +144,37 @@ function ShoppingCartPage() {
 														2
 													)}
 												</p>
-												<button
-													onClick={() =>
-														removeItem(
-															item.productId
-														)
-													}
-													className="text-xs text-red-500 hover:text-red-700 mt-2 flex items-center gap-1"
-												>
-													<Trash2 className="w-3 h-3" />
-													Remove
-												</button>
+												<div className="flex flex-col gap-1 mt-2">
+													<button
+														onClick={() =>
+															removeItem(
+																item.productId
+															)
+														}
+														className="text-xs text-red-500 hover:text-red-700 flex items-center gap-1"
+													>
+														<Trash2 className="w-3 h-3" />{" "}
+														Remove
+													</button>
+													<button
+														onClick={() =>
+															saveForLater(
+																item.productId
+															)
+														}
+														className="text-xs text-blue-500 hover:text-blue-700 flex items-center gap-1"
+													>
+														Save
+														for
+														Later
+													</button>
+												</div>
 											</div>
 										</div>
 									</div>
 								)
 							)}
 						</div>
-
-						{/* <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">
-							Your Wishlist
-						</h2>
-						<div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-							{wishlistItems.map(
-								(item) => (
-									<div
-										key={
-											item.id
-										}
-										className="flex items-center gap-6"
-									>
-										<img
-											src={
-												item.image
-											}
-											alt={
-												item.name
-											}
-											className="w-24 h-24 rounded-lg object-cover"
-										/>
-
-										<div className="flex-1">
-											<h3 className="font-semibold text-gray-900">
-												{
-													item.name
-												}
-											</h3>
-											<p className="text-sm text-gray-500">
-												Color:{" "}
-												{
-													item.color
-												}
-											</p>
-											<p className="font-semibold text-lg text-gray-900 mt-2">
-												$
-												{item.price.toFixed(
-													2
-												)}
-											</p>
-										</div>
-
-										<div className="flex flex-col items-end gap-2">
-											<button className="bg-indigo-100 text-indigo-600 text-sm font-semibold py-2 px-4 rounded-lg hover:bg-indigo-200 transition-colors">
-												Move
-												to
-												Cart
-											</button>
-											<button className="text-xs text-red-500 hover:text-red-700 flex items-center gap-1">
-												<Trash2 className="w-3 h-3" />
-												Remove
-											</button>
-										</div>
-									</div>
-								)
-							)}
-						</div> */}
 					</div>
 
 					{/* Order Summary */}
@@ -295,14 +249,6 @@ function ShoppingCartPage() {
 					</div>
 				</div>
 			</main>
-
-			{/* Click outside to close dropdown */}
-			{isProfileOpen && (
-				<div
-					className="fixed inset-0 z-40"
-					onClick={() => setIsProfileOpen(false)}
-				/>
-			)}
 		</div>
 	);
 }

@@ -20,13 +20,15 @@ import {
 import { Link, NavLink } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { useCart } from "../../context/CartContext";
+import { useCart } from "../../hooks/useCartQuery";
+import { useWishlist } from "../../hooks/useWishlistQuery";
 
 function Navbar() {
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const [isProfileOpen, setIsProfileOpen] = useState(false);
 	const { user, logout } = useAuth();
 	const { cart } = useCart();
+	const { prefetchWishlist } = useWishlist();
 
 	const handleLogout = async () => {
 		await logout();
@@ -168,8 +170,8 @@ function Navbar() {
 										<span className="absolute -top-1 -right-1 w-5 h-5 bg-indigo-600 text-white text-xs rounded-full flex items-center justify-center">
 											{
 												cart
-													.items
-													.length
+													?.products
+													?.length
 											}
 										</span>
 									</NavLink>
@@ -255,6 +257,9 @@ function Navbar() {
 													<Link
 														to={
 															"/wishlist"
+														}
+														onMouseEnter={() =>
+															prefetchWishlist()
 														}
 														className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
 													>

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Heart, Trash2, ShoppingBag } from "lucide-react";
-import { useWishlist } from "../../context/WishlistContext";
+import { useWishlist } from "../../hooks/useWishlistQuery";
 
 function Wishlist() {
 	const [isProfileOpen, setIsProfileOpen] = useState(false);

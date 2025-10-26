@@ -12,7 +12,7 @@ import {
 	ChevronDown,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
-import { useWishlist } from "../../context/WishlistContext";
+import { useWishlist } from "../../hooks/useWishlistQuery";
 
 function MyProfile({
 	onSwitchToLogin,

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
 	ArrowLeft,
 	Star,
@@ -7,28 +7,25 @@ import {
 	Plus,
 	Minus,
 } from "lucide-react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { getById } from "../../services/productService";
 
 function ProductDetailPage() {
-	const [productDetails, setProductDetails] = useState({});
+	const { productId } = useParams();
+	const navigate = useNavigate();
 	const [quantity, setQuantity] = useState(1);
 	const [isProfileOpen, setIsProfileOpen] = useState(false);
-	const { id } = useParams();
 
-	const fetchDetails = async (id) => {
-		try {
-			const res = await getById(id);
-			setProductDetails(res.data?.data);
-		} catch (error) {
-			console.error("Error fetching product details:", error);
-		}
-	};
-	useEffect(() => {
-		if (id) {
-			fetchDetails(id);
-		}
-	}, [id]);
+	const { data, isLoading, isError, error, isFetching } = useQuery({
+		queryKey: ["product", productId],
+		queryFn: () => getById(productId),
+		staleTime: 5 * 60 * 1000,
+		cacheTime: 10 * 60 * 1000,
+	});
+
+	const productDetails = data?.data?.data || {};
+
 	const relatedProducts = [
 		{
 			id: 1,
@@ -63,7 +60,7 @@ function ProductDetailPage() {
 			avatar: "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100",
 			rating: 5,
 			date: "2 months ago",
-			comment: "These headphones are amazing! The sound quality is top-notch, and the noise cancellation is incredibly effective. I can finally enjoy my music without any distractions. The battery life is also impressive. Highly recommend!",
+			comment: "These headphones are amazing! The sound quality is top-notch, and the noise cancellation is incredibly effective.",
 		},
 		{
 			id: 2,
@@ -71,42 +68,51 @@ function ProductDetailPage() {
 			avatar: "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=100",
 			rating: 4,
 			date: "3 months ago",
-			comment: "I'm really happy with these headphones. The sound is clear and balanced, and the noise cancellation works well. They're comfortable to wear for long periods, and the battery life is great.",
+			comment: "I'm really happy with these headphones. Clear sound, comfortable design, and great battery life.",
 		},
 	];
 
+	if (isLoading)
+		return (
+			<div className="flex justify-center items-center min-h-screen">
+				<p className="text-gray-500 text-lg animate-pulse">
+					Loading product details...
+				</p>
+			</div>
+		);
+
+	if (isError)
+		return (
+			<div className="flex justify-center items-center min-h-screen">
+				<p className="text-red-500">
+					Error fetching product details:{" "}
+					{error.message}
+				</p>
+			</div>
+		);
+
 	return (
 		<div className="min-h-screen bg-gray-50">
-			{/* Main Content */}
 			<main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 				{/* Back Button */}
-				<button className="flex items-center gap-2 text-gray-600 hover:text-indigo-600 mb-6 transition-colors">
+				<button
+					onClick={() => navigate(-1)}
+					className="flex items-center gap-2 text-gray-600 hover:text-indigo-600 mb-6 transition-colors"
+				>
 					<ArrowLeft className="w-4 h-4" />
 					Back to Products
 				</button>
 
 				<div className="grid lg:grid-cols-2 gap-12">
-					{/* Product Images */}
+					{/* Product Image */}
 					<div className="space-y-4">
-						{/* Main Image */}
 						<div className="aspect-square w-full rounded-xl overflow-hidden bg-gray-100">
 							<img
 								src={
 									productDetails.productImage
 								}
-								alt="Wireless Noise-Canceling Headphones"
-								className="w-full h-full object-cover"
-							/>
-						</div>
-
-						{/* Thumbnail Images */}
-						<div className="grid grid-cols-3 gap-4">
-							<img
-								src={
-									productDetails.productImage
-								}
 								alt={
-									"Product view"
+									productDetails.name
 								}
 								className="w-full h-full object-cover"
 							/>
@@ -115,27 +121,22 @@ function ProductDetailPage() {
 
 					{/* Product Info */}
 					<div className="space-y-6">
-						{/* Breadcrumb */}
 						<nav className="text-sm text-gray-500">
 							<span>Home</span>
 							<span className="mx-2">
 								/
 							</span>
-							<span>Electronics</span>
-							<span className="mx-2">
-								/
-							</span>
-							<span className="text-gray-900">
-								Headphones
+							<span>
+								{
+									productDetails.brand
+								}
 							</span>
 						</nav>
 
-						{/* Product Title */}
 						<h1 className="text-3xl lg:text-4xl font-bold text-gray-900">
 							{productDetails.name}
 						</h1>
 
-						{/* Rating */}
 						<div className="flex items-center gap-2">
 							<div className="flex text-yellow-400">
 								{[
@@ -162,7 +163,6 @@ function ProductDetailPage() {
 							</span>
 						</div>
 
-						{/* Description */}
 						<p className="text-gray-600 leading-relaxed">
 							{
 								productDetails.description
@@ -172,13 +172,13 @@ function ProductDetailPage() {
 						{/* Price */}
 						<div className="flex items-baseline gap-4">
 							<span className="text-4xl font-bold text-indigo-600">
-								&#8377;
+								₹
 								{
 									productDetails.offeredPrice
 								}
 							</span>
 							<span className="text-xl text-gray-400 line-through">
-								&#8377;
+								₹
 								{
 									productDetails.originalPrice
 								}
@@ -235,11 +235,18 @@ function ProductDetailPage() {
 								Add to Wishlist
 							</button>
 						</div>
+
+						{isFetching && (
+							<p className="text-sm text-gray-400 animate-pulse">
+								Refreshing
+								latest data...
+							</p>
+						)}
 					</div>
 				</div>
 
-				{/* Customer Reviews */}
-				<div className="mt-16">
+				{/* Related Products & Reviews */}
+				<section className="mt-16">
 					<h2 className="text-2xl font-bold text-gray-900 mb-8">
 						Customer Reviews
 					</h2>
@@ -299,52 +306,57 @@ function ProductDetailPage() {
 							</div>
 						))}
 					</div>
-				</div>
-
-				{/* Related Products */}
-				<div className="mt-16">
-					<h2 className="text-2xl font-bold text-gray-900 mb-8">
-						Related Products
-					</h2>
-					<div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-						{relatedProducts.map(
-							(product) => (
-								<div
-									key={
-										product.id
-									}
-									className="group"
-								>
-									<div className="aspect-square w-full bg-gray-100 rounded-lg mb-4 overflow-hidden">
-										<img
-											src={
-												product.image
-											}
-											alt={
+					{/* Related Products */}{" "}
+					<div className="mt-16">
+						{" "}
+						<h2 className="text-2xl font-bold text-gray-900 mb-8">
+							{" "}
+							Related Products{" "}
+						</h2>{" "}
+						<div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+							{" "}
+							{relatedProducts.map(
+								(product) => (
+									<div
+										key={
+											product.id
+										}
+										className="group"
+									>
+										{" "}
+										<div className="aspect-square w-full bg-gray-100 rounded-lg mb-4 overflow-hidden">
+											{" "}
+											<img
+												src={
+													product.image
+												}
+												alt={
+													product.name
+												}
+												className="w-full h-full object-cover transition-transform group-hover:scale-105"
+											/>{" "}
+										</div>{" "}
+										<h3 className="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
+											{" "}
+											{
 												product.name
-											}
-											className="w-full h-full object-cover transition-transform group-hover:scale-105"
-										/>
+											}{" "}
+										</h3>{" "}
+										<p className="text-gray-600">
+											{" "}
+											${" "}
+											{
+												product.price
+											}{" "}
+										</p>{" "}
 									</div>
-									<h3 className="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
-										{
-											product.name
-										}
-									</h3>
-									<p className="text-gray-600">
-										$
-										{
-											product.price
-										}
-									</p>
-								</div>
-							)
-						)}
+								)
+							)}{" "}
+						</div>
 					</div>
-				</div>
+				</section>
 			</main>
 
-			{/* Click outside to close dropdown */}
 			{isProfileOpen && (
 				<div
 					className="fixed inset-0 z-40"

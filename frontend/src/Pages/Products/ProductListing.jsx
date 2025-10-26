@@ -6,12 +6,12 @@ import {
 	Filter,
 	Grid2x2 as Grid,
 	List,
-	ChevronDown,
 	ChevronLeft,
 	ChevronRight,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { get } from "../../services/productService";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { get, getById } from "../../services/productService";
 
 function ProductListing() {
 	const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -21,10 +21,10 @@ function ProductListing() {
 	const [priceRange, setPriceRange] = useState(250);
 	const [viewMode, setViewMode] = useState("grid");
 	const [sortBy, setSortBy] = useState("featured");
-	const [products, setProducts] = useState([]);
 	const [page, setPage] = useState(1);
-	const [totalPages, setTotalPages] = useState(1);
 	const limit = 8;
+
+	const queryClient = useQueryClient();
 
 	const categories = [
 		"Clothing",
@@ -52,22 +52,24 @@ function ProductListing() {
 		);
 	};
 
-	// 🧠 Fetch Products with Pagination
-	const fetchProducts = async (currentPage = 1) => {
-		try {
-			const response = await get(currentPage, limit);
-			setProducts(response.data?.data?.products);
-			setTotalPages(
-				response.data?.data?.pagination?.totalPages || 1
-			);
-		} catch (error) {
-			console.error("Error fetching products:", error);
-		}
-	};
+	const { data, isLoading, isError, error, isFetching } = useQuery({
+		queryKey: ["products", page],
+		queryFn: () => get(page, limit),
+		keepPreviousData: true,
+		staleTime: 5 * 60 * 1000,
+	});
+
+	const products = data?.data?.data?.products || [];
+	const totalPages = data?.data?.data?.pagination?.totalPages || 1;
 
 	useEffect(() => {
-		fetchProducts(page);
-	}, [page]);
+		if (page < totalPages) {
+			queryClient.prefetchQuery({
+				queryKey: ["products", page + 1],
+				queryFn: () => get(page + 1, limit),
+			});
+		}
+	}, [page, totalPages, queryClient]);
 
 	const handleNextPage = () => {
 		if (page < totalPages) setPage(page + 1);
@@ -76,6 +78,15 @@ function ProductListing() {
 	const handlePrevPage = () => {
 		if (page > 1) setPage(page - 1);
 	};
+
+	if (isLoading)
+		return <p className="text-center mt-10">Loading products...</p>;
+	if (isError)
+		return (
+			<p className="text-center text-red-500">
+				Error: {error.message}
+			</p>
+		);
 
 	return (
 		<div className="min-h-screen bg-gray-50">
@@ -287,6 +298,11 @@ function ProductListing() {
 										products.length
 									}{" "}
 									products
+									{isFetching && (
+										<span className="ml-2 text-xs text-gray-400">
+											(updating...)
+										</span>
+									)}
 								</p>
 							</div>
 
@@ -325,6 +341,7 @@ function ProductListing() {
 										Newest
 									</option>
 								</select>
+
 								<div className="flex border border-gray-300 rounded-lg overflow-hidden">
 									<button
 										onClick={() =>
@@ -376,6 +393,20 @@ function ProductListing() {
 											product._id
 										}
 										to={`/product/${product._id}`}
+										onMouseEnter={() =>
+											queryClient.prefetchQuery(
+												{
+													queryKey: [
+														"product",
+														product._id,
+													],
+													queryFn: () =>
+														getById(
+															product._id
+														),
+												}
+											)
+										}
 										className="group bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow duration-300"
 									>
 										<div className="relative overflow-hidden">
@@ -388,12 +419,11 @@ function ProductListing() {
 												}
 												className="w-full aspect-[3/4] object-cover transition-transform duration-300 group-hover:scale-105"
 											/>
-											<div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 											<div className="absolute top-4 right-4 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-												<button className="w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-gray-600 hover:text-red-500 transition-colors">
+												<button className="w-8 h-8 bg-white/90 rounded-full flex items-center justify-center text-gray-600 hover:text-red-500 transition-colors">
 													<Heart className="w-4 h-4" />
 												</button>
-												<button className="w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-gray-600 hover:text-indigo-600 transition-colors">
+												<button className="w-8 h-8 bg-white/90 rounded-full flex items-center justify-center text-gray-600 hover:text-indigo-600 transition-colors">
 													<ShoppingCart className="w-4 h-4" />
 												</button>
 											</div>
@@ -465,28 +495,6 @@ function ProductListing() {
 					onClick={() => setIsProfileOpen(false)}
 				/>
 			)}
-
-			<style jsx>{`
-				.slider::-webkit-slider-thumb {
-					appearance: none;
-					height: 20px;
-					width: 20px;
-					border-radius: 50%;
-					background: #4f46e5;
-					cursor: pointer;
-					border: 2px solid #ffffff;
-					box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-				}
-				.slider::-moz-range-thumb {
-					height: 20px;
-					width: 20px;
-					border-radius: 50%;
-					background: #4f46e5;
-					cursor: pointer;
-					border: 2px solid #ffffff;
-					box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-				}
-			`}</style>
 		</div>
 	);
 }

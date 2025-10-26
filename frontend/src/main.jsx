@@ -27,6 +27,10 @@ import SettingsPage from "./Pages/Settings/SettingsPage.jsx";
 import DealsNewArrivalsPage from "./Pages/Deals/Deals.jsx";
 import ProductDetailPage from "./Pages/Products/Products.jsx";
 import Notification from "./Pages/Notifications/Notifications.jsx";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+
+const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
 	{
@@ -54,7 +58,7 @@ const router = createBrowserRouter([
 				),
 			},
 			{
-				path: "product/:id",
+				path: "product/:productId",
 				element: (
 					<ProtectedRoute>
 						<ProductDetailPage />
@@ -175,13 +179,12 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")).render(
 	<StrictMode>
-		<AuthContextProvider>
-			<CartContextProvider>
-				<WishlistContextProvider>
-					<RouterProvider router={router} />
-					<ToastContainer />
-				</WishlistContextProvider>
-			</CartContextProvider>
-		</AuthContextProvider>
+		<QueryClientProvider client={queryClient}>
+			<AuthContextProvider>
+				<RouterProvider router={router} />
+				<ToastContainer />
+			</AuthContextProvider>
+			<ReactQueryDevtools initialIsOpen={false} />
+		</QueryClientProvider>
 	</StrictMode>
 );
