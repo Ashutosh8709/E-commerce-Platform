@@ -1,20 +1,13 @@
 import mongoose, { Schema } from "mongoose";
+
 const productSchema = new Schema({
 	productId: {
 		type: Schema.Types.ObjectId,
 		ref: "Product",
 		required: true,
 	},
-	quantity: {
-		type: Number,
-		min: 1,
-		default: 1,
-		required: true,
-	},
-	priceAtPurchase: {
-		type: Number,
-		required: true,
-	},
+	quantity: { type: Number, min: 1, default: 1, required: true },
+	priceAtAddition: { type: Number, required: true },
 	color: String,
 	size: String,
 });
@@ -28,11 +21,29 @@ const orderSchema = new Schema(
 			index: true,
 		},
 		products: [productSchema],
+
+		totalAmount: { type: Number, required: true, default: 0 },
+		discount: { type: Number, default: 0, min: 0 },
+		finalAmount: { type: Number, min: 0 },
+
+		addressId: {
+			type: Schema.Types.ObjectId,
+			ref: "Address",
+			required: true,
+		},
+		deliveryId: { type: Schema.Types.ObjectId, ref: "Delivery" },
+
+		// Razorpay order id (string, not ObjectId)
+		paymentGatewayOrderId: { type: String, index: true },
+
+		// reference to Payment document (our collection)
+		paymentId: { type: Schema.Types.ObjectId, ref: "Payment" },
+
 		paymentStatus: {
 			type: String,
 			enum: ["pending", "paid", "failed", "refunded"],
 			default: "pending",
-			required: true,
+			index: true,
 		},
 
 		refundStatus: {
@@ -46,34 +57,7 @@ const orderSchema = new Schema(
 			],
 			default: "none",
 		},
-		paymentId: {
-			type: Schema.Types.ObjectId,
-			ref: "Payment",
-		},
-		totalAmount: {
-			type: Number,
-			required: true,
-			default: 0,
-		},
-		discount: {
-			type: Number,
-			default: 0,
-			min: 0,
-		},
-		finalAmount: {
-			type: Number,
-			min: 0,
-		},
-		addressId: {
-			type: Schema.Types.ObjectId,
-			ref: "Address",
-			required: true,
-		},
-		deliveryId: {
-			type: Schema.Types.ObjectId,
-			ref: "Delivery",
-			required: false,
-		},
+
 		status: {
 			type: String,
 			enum: [
@@ -90,11 +74,9 @@ const orderSchema = new Schema(
 			required: true,
 			index: true,
 		},
+
 		notes: String,
-		gift: {
-			type: Boolean,
-			default: false,
-		},
+		gift: { type: Boolean, default: false },
 	},
 	{ timestamps: true }
 );

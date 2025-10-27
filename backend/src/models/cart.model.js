@@ -40,7 +40,7 @@ const cartSchema = new Schema(
 			required: true,
 		},
 		products: [productSchema],
-		discount: Number,
+		discount: { type: Number, default: 0 },
 		promoCode: String,
 		status: {
 			type: String,
@@ -75,7 +75,7 @@ cartSchema.pre("findOneAndUpdate", function (next) {
 
 	if (update.products) {
 		const products = update.products;
-		const totalAmount = products.reduce(
+		let totalAmount = products.reduce(
 			(sum, p) => sum + p.quantity * p.priceAtAddition,
 			0
 		);

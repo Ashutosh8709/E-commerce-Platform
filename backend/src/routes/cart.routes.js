@@ -9,16 +9,19 @@ import {
 	savedForLater,
 	applyPromoCode,
 	placeOrder,
+	verifyPayment,
 } from "../controllers/cart.controller.js";
 
 const router = Router();
+router.post("/promo", verifyJwt, applyPromoCode);
+router.post("/place-order", verifyJwt, placeOrder);
+router.post("/verify", verifyJwt, verifyPayment);
+
 router.post("/:productId", verifyJwt, addToCart);
 router.get("/", verifyJwt, getCart);
 router.patch("/:productId/quantity", verifyJwt, updateQuantity);
 router.delete("/:productId", verifyJwt, removeItem);
 router.delete("/", verifyJwt, clearCart);
 router.post("/:productId/save", verifyJwt, savedForLater);
-router.post("/promo", verifyJwt, applyPromoCode);
-router.post("/place-order", verifyJwt, placeOrder);
 
 export default router;
