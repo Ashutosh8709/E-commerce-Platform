@@ -122,7 +122,6 @@ const addAddress = asyncHandler(async (req, res) => {
 	const {
 		name,
 		phone,
-		email,
 		street,
 		city,
 		state,

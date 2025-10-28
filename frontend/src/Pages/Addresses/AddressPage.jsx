@@ -1,12 +1,6 @@
 import React, { useState } from "react";
 import {
 	MapPin,
-	Search,
-	ShoppingCart,
-	Heart,
-	User,
-	ChevronDown,
-	Package,
 	Plus,
 	CreditCard as Edit3,
 	Trash2,

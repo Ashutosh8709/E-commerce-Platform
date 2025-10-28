@@ -23,6 +23,7 @@ import productRouter from "./routes/product.routes.js";
 import reviewRouter from "./routes/review.routes.js";
 import wishlistRouter from "./routes/wishlist.routes.js";
 import orderRouter from "./routes/order.routes.js";
+import addressRouter from "./routes/address.routes.js";
 
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/cart", cartRouter);
@@ -30,6 +31,7 @@ app.use("/api/v1/product", productRouter);
 app.use("/api/v1/review", reviewRouter);
 app.use("/api/v1/wishlist", wishlistRouter);
 app.use("/api/v1/order", orderRouter);
+app.use("/api/v1/address", addressRouter);
 
 // http://localhost:8080/api/v1/users/register
 app.use(errorHandler);

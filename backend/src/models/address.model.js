@@ -19,11 +19,6 @@ const addressSchema = new Schema(
 			minLength: 10,
 			maxLength: 15,
 		},
-		email: {
-			type: String,
-			required: true,
-			lowercase: true,
-		},
 		street: {
 			type: String,
 			trim: true,

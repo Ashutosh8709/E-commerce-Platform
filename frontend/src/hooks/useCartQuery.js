@@ -12,7 +12,6 @@ import { handleError, handleSuccess } from "../utils";
 export const useCart = () => {
 	const queryClient = useQueryClient();
 
-	// 1️⃣ Fetch cart
 	const { data: cart, isLoading } = useQuery({
 		queryKey: ["cart"],
 		queryFn: async () => {
