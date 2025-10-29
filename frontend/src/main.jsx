@@ -8,8 +8,6 @@ import Login from "./Pages/Login/Login.jsx";
 import Signup from "./Pages/Signup/Signup.jsx";
 import ForgotPasswordPage from "./Pages/Login/ForgotPassword.jsx";
 import { AuthContextProvider } from "./context/AuthContext.jsx";
-import { CartContextProvider } from "./context/CartContext.jsx";
-import { WishlistContextProvider } from "./context/WishlistContext.jsx";
 import Home from "./Pages/Home/Home.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import { ToastContainer } from "react-toastify";
@@ -29,8 +27,20 @@ import ProductDetailPage from "./Pages/Products/Products.jsx";
 import Notification from "./Pages/Notifications/Notifications.jsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { persistQueryClient } from "@tanstack/react-query-persist-client";
+import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
 
 const queryClient = new QueryClient();
+
+const localStoragePersister = createSyncStoragePersister({
+	storage: window.localStorage,
+});
+
+persistQueryClient({
+	queryClient,
+	persister: localStoragePersister,
+	maxAge: 1000 * 60 * 60 * 24,
+});
 
 const router = createBrowserRouter([
 	{

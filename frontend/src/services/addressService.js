@@ -4,28 +4,35 @@ export const get = () => {
 	return api.get("/address");
 };
 
-export const getDefault = () => {
-	return api.get("/address/default");
-};
-
 export const add = (addressData) => {
-	const { name, phone, street, city, state, country, postalCode, label } =
-		addressData;
-
-	return api.post("/address", {
+	const {
 		name,
 		phone,
-		email,
 		street,
 		city,
 		state,
 		country,
 		postalCode,
 		label,
+		isDefault,
+	} = addressData;
+
+	return api.post("/address", {
+		name,
+		phone,
+		street,
+		city,
+		state,
+		country,
+		postalCode,
+		label,
+		isDefault,
 	});
 };
 
-export const update = (addressData) => {};
+export const update = (addressId, addressData) => {
+	return api.patch(`/address/${addressId}`, addressData);
+};
 
 export const remove = (addressId) => {
 	return api.delete(`/address/${addressId}`);

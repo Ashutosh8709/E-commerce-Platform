@@ -1,29 +1,32 @@
 import React, { useState } from "react";
-import { Package, ShoppingCart, User, Heart, Search } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useAddress } from "../../hooks/useAddressQuery";
+import { useCart } from "../../hooks/useCartQuery";
 
 function CheckoutPage() {
 	const [selectedAddress, setSelectedAddress] = useState("home");
 	const [selectedPayment, setSelectedPayment] = useState("credit");
 	const [isProfileOpen, setIsProfileOpen] = useState(false);
+	const { addresses } = useAddress();
+	const { cart } = useCart();
 
-	const addresses = [
-		{
-			id: "home",
-			label: "Home",
-			address: "123 Maple Street, Anytown, USA",
-		},
-		{
-			id: "work",
-			label: "Work",
-			address: "456 Oak Avenue, Anytown, USA",
-		},
-		{
-			id: "other",
-			label: "Other",
-			address: "789 Pine Lane, Anytown, USA",
-		},
-	];
+	// const addresses = [
+	// 	{
+	// 		id: "home",
+	// 		label: "Home",
+	// 		address: "123 Maple Street, Anytown, USA",
+	// 	},
+	// 	{
+	// 		id: "work",
+	// 		label: "Work",
+	// 		address: "456 Oak Avenue, Anytown, USA",
+	// 	},
+	// 	{
+	// 		id: "other",
+	// 		label: "Other",
+	// 		address: "789 Pine Lane, Anytown, USA",
+	// 	},
+	// ];
 
 	const paymentMethods = [
 		{
@@ -38,6 +41,8 @@ function CheckoutPage() {
 			description: "Pay via Net Banking",
 		},
 	];
+
+	const finalAmount = cart?.totalAmount - cart?.discount + 5;
 
 	return (
 		<div className="min-h-screen bg-gray-50">
@@ -78,11 +83,11 @@ function CheckoutPage() {
 									) => (
 										<label
 											key={
-												address.id
+												address._id
 											}
 											className={`relative flex cursor-pointer rounded-lg border p-4 shadow-sm transition-all ${
 												selectedAddress ===
-												address.id
+												address._id
 													? "border-indigo-500 ring-2 ring-indigo-200 bg-indigo-50"
 													: "border-gray-200 bg-white hover:border-gray-300"
 											}`}
@@ -91,11 +96,11 @@ function CheckoutPage() {
 												type="radio"
 												name="shipping-address"
 												value={
-													address.id
+													address._id
 												}
 												checked={
 													selectedAddress ===
-													address.id
+													address._id
 												}
 												onChange={(
 													e
@@ -112,13 +117,13 @@ function CheckoutPage() {
 												<div
 													className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
 														selectedAddress ===
-														address.id
+														address._id
 															? "border-indigo-500 bg-indigo-500"
 															: "border-gray-300"
 													}`}
 												>
 													{selectedAddress ===
-														address.id && (
+														address._id && (
 														<div className="w-2 h-2 bg-white rounded-full"></div>
 													)}
 												</div>
@@ -130,7 +135,17 @@ function CheckoutPage() {
 													</span>
 													<p className="text-sm text-gray-600">
 														{
-															address.address
+															address.street
+														}
+
+														,
+														{
+															address.city
+														}
+
+														,
+														{
+															address.country
 														}
 													</p>
 												</div>
@@ -144,7 +159,7 @@ function CheckoutPage() {
 							</button>
 						</div>
 
-						{/* Payment Method */}
+						{/* Payment Method
 						<div className="space-y-6">
 							<h3 className="text-lg font-semibold text-gray-900">
 								Payment Method
@@ -217,7 +232,7 @@ function CheckoutPage() {
 									)
 								)}
 							</div>
-						</div>
+						</div> */}
 					</div>
 
 					{/* Right Column - Order Summary */}
@@ -232,7 +247,10 @@ function CheckoutPage() {
 										Subtotal
 									</span>
 									<span className="text-sm font-medium text-gray-900">
-										$120.00
+										$
+										{
+											cart.totalAmount
+										}
 									</span>
 								</div>
 								<div className="flex justify-between border-t border-gray-200 pt-4">
@@ -248,7 +266,10 @@ function CheckoutPage() {
 										Discount
 									</span>
 									<span className="text-sm font-medium text-green-600">
-										-$10.00
+										$
+										{
+											cart.discount
+										}
 									</span>
 								</div>
 								<div className="flex justify-between border-t border-gray-200 pt-4">
@@ -256,7 +277,10 @@ function CheckoutPage() {
 										Total
 									</span>
 									<span className="text-base font-semibold text-gray-900">
-										$115.00
+										$
+										{
+											finalAmount
+										}
 									</span>
 								</div>
 							</div>
@@ -268,14 +292,6 @@ function CheckoutPage() {
 					</div>
 				</div>
 			</main>
-
-			{/* Click outside to close dropdown */}
-			{isProfileOpen && (
-				<div
-					className="fixed inset-0 z-40"
-					onClick={() => setIsProfileOpen(false)}
-				/>
-			)}
 		</div>
 	);
 }

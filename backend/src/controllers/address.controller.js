@@ -40,11 +40,11 @@ const getAddress = asyncHandler(async (req, res) => {
 		.lean();
 
 	if (!addresses || addresses.length === 0) {
-		throw new ApiError(404, "No addresses found");
+		return res.status(200).json(200, {}, "No address Found");
 	}
 
 	try {
-		await client.setEx(cacheKey, 3600, JSON.stringify(addresses));
+		await client.setex(cacheKey, 3600, JSON.stringify(addresses));
 	} catch (err) {
 		console.error("Redis cache save failed:", err.message);
 	}
@@ -60,61 +60,9 @@ const getAddress = asyncHandler(async (req, res) => {
 		);
 });
 
-const getDefaultAddress = asyncHandler(async (req, res) => {
-	const userId = req.user?._id;
-	if (!userId) {
-		throw new ApiError(401, "Unauthorized access");
-	}
-
-	const cacheKey = `user:${userId}:defaultAddress`;
-	let cachedAddress;
-
-	try {
-		cachedAddress = await client.get(cacheKey);
-	} catch (err) {
-		console.warn("Redis unavailable, skipping cache:", err.message);
-	}
-
-	if (cachedAddress) {
-		return res
-			.status(200)
-			.json(
-				new ApiResponse(
-					200,
-					JSON.parse(cachedAddress),
-					"Default address fetched from cache"
-				)
-			);
-	}
-
-	const address = await Address.findOne({
-		owner: userId,
-		isDefault: true,
-	});
-
-	if (!address) {
-		throw new ApiError(404, "No default address found");
-	}
-
-	try {
-		await client.setEx(cacheKey, 3600, JSON.stringify(address));
-	} catch (err) {
-		console.error("Redis cache save failed:", err.message);
-	}
-
-	return res
-		.status(200)
-		.json(
-			new ApiResponse(
-				200,
-				address,
-				"Default address fetched successfully"
-			)
-		);
-});
-
 const addAddress = asyncHandler(async (req, res) => {
 	const userId = req.user?._id;
+
 	if (!userId) {
 		throw new ApiError(401, "Unauthorized Access");
 	}
@@ -146,12 +94,12 @@ const addAddress = asyncHandler(async (req, res) => {
 	const existingAddresses = await Address.countDocuments({
 		owner: userId,
 	});
+
 	const makeDefault = existingAddresses === 0 || isDefault;
 
 	const newAddress = await Address.create({
 		name,
 		phone,
-		email,
 		street,
 		city,
 		state,
@@ -179,10 +127,10 @@ const addAddress = asyncHandler(async (req, res) => {
 	}
 
 	return res
-		.status(201)
+		.status(200)
 		.json(
 			new ApiResponse(
-				201,
+				200,
 				newAddress,
 				"Address added successfully"
 			)
@@ -335,11 +283,4 @@ const markAsDefault = asyncHandler(async (req, res) => {
 		);
 });
 
-export {
-	getAddress,
-	getDefaultAddress,
-	addAddress,
-	updateAddress,
-	removeAddress,
-	markAsDefault,
-};
+export { getAddress, addAddress, updateAddress, removeAddress, markAsDefault };
