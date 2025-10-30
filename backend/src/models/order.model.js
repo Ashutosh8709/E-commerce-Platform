@@ -7,6 +7,8 @@ const productSchema = new Schema({
 		required: true,
 	},
 	quantity: { type: Number, min: 1, default: 1, required: true },
+	image: { type: String, required: true },
+	name: { type: String, required: true },
 	priceAtAddition: { type: Number, required: true },
 	color: String,
 	size: String,

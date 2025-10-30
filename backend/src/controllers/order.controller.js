@@ -13,12 +13,15 @@ const getUserOrders = asyncHandler(async (req, res) => {
 		throw new ApiError(401, "Unauthorised Access");
 	}
 
-	const orders = await Order.find({ owner: userId }).sort({
-		createdAt: -1,
-	});
+	const orders = await Order.find({ owner: userId })
+		.sort({
+			createdAt: -1,
+		})
+		.select("-paymentId")
+		.select("-paymentGatewayOrderId");
 
 	if (!orders || orders.length === 0) {
-		throw new ApiError(400, "No orders found for this user");
+		throw new ApiError(200, "No orders found for this user");
 	}
 
 	return res

@@ -2,87 +2,30 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAddress } from "../../hooks/useAddressQuery";
 import { useCart } from "../../hooks/useCartQuery";
-import { placeOrder, verifyPayment } from "../../services/cartService";
-import { handleSuccess, handleError } from "../../utils";
+import { handleError } from "../../utils";
+import { useOrder } from "../../hooks/useOrderQuery";
 import { useNavigate } from "react-router-dom";
 
 function CheckoutPage() {
 	const [selectedAddress, setSelectedAddress] = useState("home");
 	const { addresses } = useAddress();
-	const { cart, refetch } = useCart();
+	const { cart } = useCart();
+	const { placeOrder } = useOrder();
 	const navigate = useNavigate();
 
-	// const addresses = [
-	// 	{
-	// 		id: "home",
-	// 		label: "Home",
-	// 		address: "123 Maple Street, Anytown, USA",
-	// 	},
-	// 	{
-	// 		id: "work",
-	// 		label: "Work",
-	// 		address: "456 Oak Avenue, Anytown, USA",
-	// 	},
-	// 	{
-	// 		id: "other",
-	// 		label: "Other",
-	// 		address: "789 Pine Lane, Anytown, USA",
-	// 	},
-	// ];
-
 	const handlePayment = async () => {
+		if (!selectedAddress) {
+			handleError("Please select a shipping address");
+			return;
+		}
+
 		try {
-			const res = await placeOrder(selectedAddress);
-			const order = res.data.data;
-
-			const options = {
-				key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-				amount: order.razorpayOrder.amount,
-				currency: order.razorpayOrder.currency,
-				name: "SwiftCart",
-				description: "Purchase at MyStore",
-				order_id: order.razorpayOrder.id,
-				handler: async (response) => {
-					const verifyRes = await verifyPayment(
-						response
-					);
-					if (verifyRes.data.success) {
-						setTimeout(
-							() => navigate("/home"),
-							1000
-						);
-						refetch();
-						handleSuccess(
-							"Payment Succesfull"
-						);
-					}
-				},
-				theme: { color: "#4f46e5" },
-			};
-
-			const rzp = new window.Razorpay(options);
-			rzp.open();
+			placeOrder(selectedAddress);
 		} catch (err) {
-			handleError(
-				"Something went wrong while initiating payment"
-			);
+			handleError("Failed to place order");
 			navigate("/cart");
 		}
 	};
-
-	const paymentMethods = [
-		{
-			id: "credit",
-			label: "Credit Card",
-			description: "Visa ending in 1234",
-		},
-		{ id: "upi", label: "UPI", description: "Pay via UPI" },
-		{
-			id: "netbanking",
-			label: "Net Banking",
-			description: "Pay via Net Banking",
-		},
-	];
 
 	const finalAmount = cart?.totalAmount - cart?.discount + 5;
 
@@ -200,81 +143,6 @@ function CheckoutPage() {
 								Add New Address
 							</button>
 						</div>
-
-						{/* Payment Method
-						<div className="space-y-6">
-							<h3 className="text-lg font-semibold text-gray-900">
-								Payment Method
-							</h3>
-							<div className="space-y-4">
-								{paymentMethods.map(
-									(
-										method
-									) => (
-										<label
-											key={
-												method.id
-											}
-											className={`relative flex cursor-pointer rounded-lg border p-4 shadow-sm transition-all ${
-												selectedPayment ===
-												method.id
-													? "border-indigo-500 ring-2 ring-indigo-200 bg-indigo-50"
-													: "border-gray-200 bg-white hover:border-gray-300"
-											}`}
-										>
-											<input
-												type="radio"
-												name="payment-method"
-												value={
-													method.id
-												}
-												checked={
-													selectedPayment ===
-													method.id
-												}
-												onChange={(
-													e
-												) =>
-													setSelectedPayment(
-														e
-															.target
-															.value
-													)
-												}
-												className="sr-only"
-											/>
-											<div className="flex items-center">
-												<div
-													className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-														selectedPayment ===
-														method.id
-															? "border-indigo-500 bg-indigo-500"
-															: "border-gray-300"
-													}`}
-												>
-													{selectedPayment ===
-														method.id && (
-														<div className="w-2 h-2 bg-white rounded-full"></div>
-													)}
-												</div>
-												<div className="ml-4">
-													<span className="text-sm font-semibold text-gray-900">
-														{
-															method.label
-														}
-													</span>
-													<p className="text-sm text-gray-600">
-														{
-															method.description
-														}
-													</p>
-												</div>
-											</div>
-										</label>
-									)
-								)}
-							</div>
-						</div> */}
 					</div>
 
 					{/* Right Column - Order Summary */}
