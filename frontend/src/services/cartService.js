@@ -23,3 +23,11 @@ export const clear = () => {
 export const save = (productId) => {
 	return api.post(`/cart/${productId}/save`);
 };
+
+export const placeOrder = (shippingAddress) => {
+	return api.post("/cart/place-order", { shippingAddress });
+};
+
+export const verifyPayment = (data) => {
+	return api.post("/cart/verify", data);
+};

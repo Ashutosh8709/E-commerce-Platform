@@ -2,13 +2,15 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAddress } from "../../hooks/useAddressQuery";
 import { useCart } from "../../hooks/useCartQuery";
+import { placeOrder, verifyPayment } from "../../services/cartService";
+import { handleSuccess, handleError } from "../../utils";
+import { useNavigate } from "react-router-dom";
 
 function CheckoutPage() {
 	const [selectedAddress, setSelectedAddress] = useState("home");
-	const [selectedPayment, setSelectedPayment] = useState("credit");
-	const [isProfileOpen, setIsProfileOpen] = useState(false);
 	const { addresses } = useAddress();
-	const { cart } = useCart();
+	const { cart, refetch } = useCart();
+	const navigate = useNavigate();
 
 	// const addresses = [
 	// 	{
@@ -27,6 +29,46 @@ function CheckoutPage() {
 	// 		address: "789 Pine Lane, Anytown, USA",
 	// 	},
 	// ];
+
+	const handlePayment = async () => {
+		try {
+			const res = await placeOrder(selectedAddress);
+			const order = res.data.data;
+
+			const options = {
+				key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+				amount: order.razorpayOrder.amount,
+				currency: order.razorpayOrder.currency,
+				name: "SwiftCart",
+				description: "Purchase at MyStore",
+				order_id: order.razorpayOrder.id,
+				handler: async (response) => {
+					const verifyRes = await verifyPayment(
+						response
+					);
+					if (verifyRes.data.success) {
+						setTimeout(
+							() => navigate("/home"),
+							1000
+						);
+						refetch();
+						handleSuccess(
+							"Payment Succesfull"
+						);
+					}
+				},
+				theme: { color: "#4f46e5" },
+			};
+
+			const rzp = new window.Razorpay(options);
+			rzp.open();
+		} catch (err) {
+			handleError(
+				"Something went wrong while initiating payment"
+			);
+			navigate("/cart");
+		}
+	};
 
 	const paymentMethods = [
 		{
@@ -286,7 +328,10 @@ function CheckoutPage() {
 							</div>
 						</div>
 
-						<button className="w-full bg-indigo-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-indigo-700 transition-colors shadow-lg hover:shadow-xl">
+						<button
+							onClick={handlePayment}
+							className="w-full bg-indigo-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-indigo-700 transition-colors shadow-lg hover:shadow-xl"
+						>
 							Place Order
 						</button>
 					</div>

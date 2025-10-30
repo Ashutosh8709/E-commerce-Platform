@@ -12,7 +12,11 @@ import { handleError, handleSuccess } from "../utils";
 export const useCart = () => {
 	const queryClient = useQueryClient();
 
-	const { data: cart, isLoading } = useQuery({
+	const {
+		data: cart,
+		isLoading,
+		refetch,
+	} = useQuery({
 		queryKey: ["cart"],
 		queryFn: async () => {
 			const res = await get();
@@ -120,6 +124,7 @@ export const useCart = () => {
 
 	return {
 		cart,
+		refetch,
 		loading: isLoading,
 		addToCart: addMutation.mutate,
 		updateQuantity: updateMutation.mutate,

@@ -1,24 +1,7 @@
 import React, { useState } from "react";
-import {
-	Package,
-	Search,
-	ShoppingCart,
-	Heart,
-	User,
-	ChevronDown,
-	Eye,
-	Download,
-	RefreshCw,
-	Truck,
-} from "lucide-react";
+import { Package, Eye, Download, RefreshCw, Truck } from "lucide-react";
 
-function MyOrders({
-	onSwitchToLogin,
-	onSwitchToSignup,
-	onSwitchToCart,
-	onSwitchToProducts,
-}) {
-	const [isProfileOpen, setIsProfileOpen] = useState(false);
+function MyOrders() {
 	const [selectedFilter, setSelectedFilter] = useState("all");
 
 	const orders = [
@@ -247,14 +230,6 @@ function MyOrders({
 					</div>
 				)}
 			</main>
-
-			{/* Click outside to close dropdown */}
-			{isProfileOpen && (
-				<div
-					className="fixed inset-0 z-40"
-					onClick={() => setIsProfileOpen(false)}
-				/>
-			)}
 		</div>
 	);
 }
