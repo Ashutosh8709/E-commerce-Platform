@@ -19,8 +19,10 @@ const createProduct = asyncHandler(async (req, res) => {
     originalPrice,
     offeredPrice,
     stock,
+    size,
     colors,
     categoryId,
+    isFeatured = false,
   } = req.body;
 
   if (!sellerId) {
@@ -77,8 +79,10 @@ const createProduct = asyncHandler(async (req, res) => {
     originalPrice,
     offeredPrice,
     stock,
+    size,
     colors,
     categoryId,
+    isFeatured,
     productImage: uploadedImage.secure_url,
   });
 
@@ -86,7 +90,15 @@ const createProduct = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Error while adding product");
   }
 
-  await client.del("newArrivals");
+  try {
+    await Promise.all([
+      client.del("newArrivals:products"),
+      client.del("products:page:*"),
+      client.del("products:featured:list"),
+    ]);
+  } catch (err) {
+    console.log("Redis invalidation failed:", err.message);
+  }
 
   return res
     .status(200)
@@ -172,6 +184,16 @@ const deleteProduct = asyncHandler(async (req, res) => {
   const deletedProduct = await Product.findByIdAndDelete(productId);
   if (!deletedProduct) {
     throw new ApiError(400, "Product not deleted");
+  }
+
+  try {
+    await Promise.all([
+      client.del(`product:${productId}`),
+      client.del("newArrivals:products"),
+      client.del("products:featured:list"),
+    ]);
+  } catch (err) {
+    console.warn("Redis invalidation failed:", err.message);
   }
 
   return res
@@ -398,6 +420,47 @@ const getNewArrivals = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, newProducts, "New Products Fetched"));
 });
 
+const getDeals = asyncHandler(async (req, res) => {
+  const cacheKey = "products:deals:active";
+  try {
+    const cached = await client.get(cacheKey);
+    if (cached) {
+      return res
+        .status(200)
+        .json(
+          new ApiResponse(200, safeParse(cached), "Deals fetched from cache")
+        );
+    }
+  } catch (err) {
+    console.warn("Redis unavailable:", err.message);
+  }
+
+  const now = new Date();
+  const deals = await Product.find({
+    "deal.isActive": true,
+    $or: [
+      { "deal.startDate": { $lte: now }, "deal.endDate": { $gte: now } },
+      {
+        "deal.startDate": { $exists: false },
+        "deal.endDate": { $exists: false },
+      },
+    ],
+  })
+    .sort({ "deal.discountPercent": -1, createdAt: -1 })
+    .limit(20)
+    .lean();
+
+  try {
+    await client.setex(cacheKey, 600, JSON.stringify(deals));
+  } catch (err) {
+    console.warn("Redis save failed:", err.message);
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, deals, "Active deals fetched"));
+});
+
 const getTopRatedProducts = asyncHandler(async (req, res) => {});
 
 const filterProducts = asyncHandler(async (req, res) => {});
@@ -414,6 +477,7 @@ export {
   getProductsByCategory,
   getNewArrivals,
   getTopRatedProducts,
+  getDeals,
   filterProducts,
   getRelatedProducts,
 };
