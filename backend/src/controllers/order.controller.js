@@ -182,7 +182,7 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Order not found");
   }
 
-  io.emit("order:statusUpdated", {
+  global.io.emit("order:statusUpdated", {
     orderId: order._id,
     status: order.status,
   });
@@ -197,6 +197,20 @@ const getAllOrders = asyncHandler(async (req, res) => {
   // check if role is admin
   // give all orders done till now
   // need websockets
+  const role = req.user?.role;
+  if (role !== "admin") {
+    throw new ApiError(401, "Unauthorized Access");
+  }
+
+  const orders = await Order.find({});
+
+  if (!orders || !orders.length) {
+    throw new ApiError(400, "No Order Found");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, orders, "Fetched All orders successfully"));
 });
 
 const getSalesAnalytics = asyncHandler(async (req, res) => {});

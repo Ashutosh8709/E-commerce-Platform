@@ -9,7 +9,6 @@ import { Payment } from "../models/payment.model.js";
 import { getRazorpayInstance } from "../config/razorpay.js";
 import crypto from "crypto";
 import mongoose from "mongoose";
-import { log } from "console";
 
 const addToCart = asyncHandler(async (req, res) => {
   // take product details from req.body
@@ -283,7 +282,7 @@ const placeOrder = asyncHandler(async (req, res) => {
       paymentGatewayOrderId: razorpayOrder.id,
     });
 
-    io.emit("order:new", {
+    global.io.emit("order:new", {
       _id: order._id,
       status: order.status,
       totalAmount: order.finalAmount,

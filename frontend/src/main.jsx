@@ -206,13 +206,11 @@ const router = createBrowserRouter([
 ]);
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <AuthContextProvider>
-        <RouterProvider router={router} />
-        <ToastContainer />
-      </AuthContextProvider>
-      <ReactQueryDevtools initialIsOpen={false} />
-    </QueryClientProvider>
-  </StrictMode>
+  <QueryClientProvider client={queryClient}>
+    <AuthContextProvider>
+      <RouterProvider router={router} />
+      <ToastContainer />
+    </AuthContextProvider>
+    <ReactQueryDevtools initialIsOpen={false} />
+  </QueryClientProvider>
 );

@@ -14,7 +14,9 @@ export const cancel = (id) => {
 
 export const updateStatus = () => {};
 
-export const getAllOrders = () => {};
+export const getAllOrders = () => {
+  return api.get("/order/all");
+};
 
 export const getSales = () => {};
 
