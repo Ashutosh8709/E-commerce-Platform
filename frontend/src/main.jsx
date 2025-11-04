@@ -68,7 +68,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "product/:productId",
+        path: "/product/:productId",
         element: (
           <ProtectedRoute>
             <ProductDetailPage />

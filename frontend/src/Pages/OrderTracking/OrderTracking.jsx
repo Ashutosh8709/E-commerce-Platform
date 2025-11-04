@@ -2,6 +2,7 @@ import { useParams } from "react-router-dom";
 import { Check, Truck, Home, ChevronRight, Package } from "lucide-react";
 import { useOrder } from "../../hooks/useOrderQuery";
 import moment from "moment";
+import { Link } from "react-router-dom";
 
 function OrderTrackingPage() {
   const { orderId } = useParams();
@@ -31,7 +32,7 @@ function OrderTrackingPage() {
     status,
     finalAmount,
     products,
-    addressId,
+    address,
     paymentStatus,
   } = order;
 
@@ -143,7 +144,7 @@ function OrderTrackingPage() {
                     <div className="flex justify-between">
                       <span className="text-gray-500">Shipping Address</span>
                       <span className="font-medium text-gray-800 text-right max-w-[200px] truncate">
-                        {addressId || "Not available"}
+                        {address || "Not available"}
                       </span>
                     </div>
                     <div className="flex justify-between">
@@ -199,12 +200,16 @@ function OrderTrackingPage() {
                   {products.map((item, index) => (
                     <tr key={index}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 flex items-center gap-3">
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="w-12 h-12 rounded-md object-cover"
-                        />
-                        {item.name}
+                        <Link to={`/product/${item.productId}`}>
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            className="w-12 h-12 rounded-md object-cover"
+                          />
+                        </Link>
+                        <Link to={`/product/${item.productId}`}>
+                          {item.name}
+                        </Link>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {item.quantity}

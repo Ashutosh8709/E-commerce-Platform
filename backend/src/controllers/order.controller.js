@@ -88,7 +88,7 @@ const getOrderById = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, order, "Order Fetched Successfully"));
+    .json(new ApiResponse(200, order[0], "Order Fetched Successfully"));
 });
 
 const cancelOrder = asyncHandler(async (req, res) => {
