@@ -12,7 +12,6 @@ import Home from "./Pages/Home/Home.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import { ToastContainer } from "react-toastify";
 import Cart from "./Pages/Cart/Cart.jsx";
-import OrderTracking from "./Pages/OrderTracking/OrderTracking.jsx";
 import Checkout from "./Pages/CheckOut/CheckOut.jsx";
 import ProductListing from "./Pages/Products/ProductListing.jsx";
 import AddressPage from "./Pages/Addresses/AddressPage.jsx";
@@ -29,6 +28,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { persistQueryClient } from "@tanstack/react-query-persist-client";
 import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
+import OrderTrackingPage from "./Pages/OrderTracking/OrderTracking.jsx";
 
 const queryClient = new QueryClient();
 
@@ -84,14 +84,6 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "/order-track/:id",
-        element: (
-          <ProtectedRoute>
-            <OrderTracking />
-          </ProtectedRoute>
-        ),
-      },
-      {
         path: "/notifications/:id",
         element: (
           <ProtectedRoute>
@@ -120,6 +112,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <HelpSupport />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/orderDetail/:orderId",
+        element: (
+          <ProtectedRoute>
+            <OrderTrackingPage />
           </ProtectedRoute>
         ),
       },

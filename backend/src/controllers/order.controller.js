@@ -2,6 +2,7 @@ import { asyncHandler } from "../utils/AsyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Order } from "../models/order.model.js";
+import mongoose from "mongoose";
 
 const getUserOrders = asyncHandler(async (req, res) => {
   // get userId from req.user
@@ -45,9 +46,43 @@ const getOrderById = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Order id is required");
   }
 
-  const order = await Order.findOne({ owner: userId, _id: orderId });
+  const order = await Order.aggregate([
+    {
+      $match: {
+        owner: new mongoose.Types.ObjectId(userId),
+        _id: new mongoose.Types.ObjectId(orderId),
+      },
+    },
+    {
+      $lookup: {
+        from: "addresses",
+        localField: "addressId",
+        foreignField: "_id",
+        as: "address",
+      },
+    },
+    {
+      $addFields: { address: { $arrayElemAt: ["$address", 0] } },
+    },
+    {
+      $project: {
+        owner: 1,
+        products: 1,
+        totalAmount: 1,
+        discount: 1,
+        finalAmount: 1,
+        paymentStatus: 1,
+        refundStatus: 1,
+        status: 1,
+        gift: 1,
+        createdAt: 1,
+        updatedAt: 1,
+        address: "$address.street",
+      },
+    },
+  ]);
 
-  if (!order) {
+  if (!order || order.length == 0) {
     throw new ApiError(400, "Order not found or not ordered by you");
   }
 
