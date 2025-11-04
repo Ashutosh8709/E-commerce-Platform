@@ -64,7 +64,9 @@ function OrderTrackingPage() {
         <div className="max-w-4xl mx-auto">
           {/* Breadcrumb */}
           <nav className="flex items-center space-x-2 text-sm mb-8">
-            <span className="text-gray-500">Orders</span>
+            <Link to={"/orders"} className="text-gray-500">
+              Orders
+            </Link>
             <ChevronRight className="w-4 h-4 text-gray-400" />
             <span className="text-gray-900 font-medium">
               Order #{_id.slice(-6).toUpperCase()}

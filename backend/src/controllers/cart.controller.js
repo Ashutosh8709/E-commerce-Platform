@@ -283,6 +283,14 @@ const placeOrder = asyncHandler(async (req, res) => {
       paymentGatewayOrderId: razorpayOrder.id,
     });
 
+    io.emit("order:new", {
+      _id: order._id,
+      status: order.status,
+      totalAmount: order.finalAmount,
+      createdAt: order.createdAt,
+      owner: order.owner,
+    });
+
     paymentDoc.orderId = order._id;
     await paymentDoc.save();
 
@@ -293,7 +301,7 @@ const placeOrder = asyncHandler(async (req, res) => {
       })
     );
   } catch (error) {
-    console.error("❌ placeOrder error:", error);
+    console.error("placeOrder error:", error);
     throw error;
   }
 });

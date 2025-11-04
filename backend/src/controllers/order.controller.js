@@ -144,7 +144,53 @@ const cancelOrder = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, order, "Order cancelled successfully"));
 });
 
-const updateOrderStatus = asyncHandler(async (req, res) => {});
+const updateOrderStatus = asyncHandler(async (req, res) => {
+  const userId = req.user?._id;
+  const { orderId } = req.params;
+  const { status } = req.body;
+  const role = req.user?.role;
+
+  if (!userId) throw new ApiError(401, "Unauthorized Access");
+
+  if (role !== "admin" && role !== "seller") {
+    throw new ApiError(403, "You are not authorized to update the status");
+  }
+
+  if (!orderId || !status)
+    throw new ApiError(404, "All details are required to update");
+
+  const allowedStatuses = [
+    "placed",
+    "confirmed",
+    "shipped",
+    "delivered",
+    "cancelled",
+  ];
+  if (!allowedStatuses.includes(status)) {
+    throw new ApiError(400, "Invalid status value");
+  }
+
+  const order = await Order.findByIdAndUpdate(
+    orderId,
+    {
+      status,
+    },
+    { new: true }
+  );
+
+  if (!order) {
+    throw new ApiError(404, "Order not found");
+  }
+
+  io.emit("order:statusUpdated", {
+    orderId: order._id,
+    status: order.status,
+  });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, order, "Order Status updated"));
+});
 
 const getAllOrders = asyncHandler(async (req, res) => {
   // get user details from req.user

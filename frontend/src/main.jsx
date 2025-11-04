@@ -29,6 +29,8 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { persistQueryClient } from "@tanstack/react-query-persist-client";
 import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
 import OrderTrackingPage from "./Pages/OrderTracking/OrderTracking.jsx";
+import SellerStorePage from "./Pages/SellerDashboard/SellerDashboard.jsx";
+import AdminDashboard from "./Pages/AdminPanel/AdminPanel.jsx";
 
 const queryClient = new QueryClient();
 
@@ -168,6 +170,22 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <DealsNewArrivalsPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/seller",
+        element: (
+          <ProtectedRoute>
+            <SellerStorePage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/admin",
+        element: (
+          <ProtectedRoute>
+            <AdminDashboard />
           </ProtectedRoute>
         ),
       },
