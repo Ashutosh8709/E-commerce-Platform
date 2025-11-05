@@ -144,93 +144,16 @@ const cancelOrder = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, order, "Order cancelled successfully"));
 });
 
-const updateOrderStatus = asyncHandler(async (req, res) => {
-  const userId = req.user?._id;
-  const { orderId } = req.params;
-  const { status } = req.body;
-  const role = req.user?.role;
-
-  if (!userId) throw new ApiError(401, "Unauthorized Access");
-
-  if (role !== "admin" && role !== "seller") {
-    throw new ApiError(403, "You are not authorized to update the status");
-  }
-
-  if (!orderId || !status)
-    throw new ApiError(404, "All details are required to update");
-
-  const allowedStatuses = [
-    "placed",
-    "confirmed",
-    "shipped",
-    "delivered",
-    "cancelled",
-  ];
-  if (!allowedStatuses.includes(status)) {
-    throw new ApiError(400, "Invalid status value");
-  }
-
-  const order = await Order.findByIdAndUpdate(
-    orderId,
-    {
-      status,
-    },
-    { new: true }
-  );
-
-  if (!order) {
-    throw new ApiError(404, "Order not found");
-  }
-
-  global.io.emit("order:statusUpdated", {
-    orderId: order._id,
-    status: order.status,
-  });
-
-  return res
-    .status(200)
-    .json(new ApiResponse(200, order, "Order Status updated"));
-});
-
-const getAllOrders = asyncHandler(async (req, res) => {
-  // get user details from req.user
-  // check if role is admin
-  // give all orders done till now
-  // need websockets
-  const role = req.user?.role;
-  if (role !== "admin") {
-    throw new ApiError(401, "Unauthorized Access");
-  }
-
-  const orders = await Order.find({});
-
-  if (!orders || !orders.length) {
-    throw new ApiError(400, "No Order Found");
-  }
-
-  return res
-    .status(200)
-    .json(new ApiResponse(200, orders, "Fetched All orders successfully"));
-});
-
-const getSalesAnalytics = asyncHandler(async (req, res) => {});
-
 const returnOrder = asyncHandler(async (req, res) => {});
 
 const reorder = asyncHandler(async (req, res) => {});
 
 const autoCancelUnpaidOrders = asyncHandler(async (req, res) => {});
 
-const getRevenueStats = asyncHandler(async (req, res) => {});
-
 export {
   getUserOrders,
   getOrderById,
   cancelOrder,
-  updateOrderStatus,
-  getAllOrders,
-  getRevenueStats,
-  getSalesAnalytics,
   reorder,
   returnOrder,
   autoCancelUnpaidOrders,

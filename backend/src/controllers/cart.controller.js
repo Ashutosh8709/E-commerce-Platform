@@ -282,14 +282,6 @@ const placeOrder = asyncHandler(async (req, res) => {
       paymentGatewayOrderId: razorpayOrder.id,
     });
 
-    global.io.emit("order:new", {
-      _id: order._id,
-      status: order.status,
-      totalAmount: order.finalAmount,
-      createdAt: order.createdAt,
-      owner: order.owner,
-    });
-
     paymentDoc.orderId = order._id;
     await paymentDoc.save();
 
@@ -346,6 +338,13 @@ const verifyPayment = asyncHandler(async (req, res) => {
     order.status = "confirmed";
     await order.save({ session });
 
+    global.io.emit("order:new", {
+      _id: order._id,
+      status: order.status,
+      totalAmount: order.finalAmount,
+      createdAt: order.createdAt,
+      owner: order.owner,
+    });
     await Cart.findOneAndUpdate(
       { owner: order.owner },
       {

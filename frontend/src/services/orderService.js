@@ -12,18 +12,6 @@ export const cancel = (id) => {
   return api.patch(`/order/${id}/cancel`);
 };
 
-export const updateStatus = () => {};
-
-export const getAllOrders = () => {
-  return api.get("/order/all");
-};
-
-export const getSales = () => {};
-
 export const returnOrder = () => {};
 
 export const reorder = () => {};
-
-export const autoCancel = () => {};
-
-export const getRevenue = () => {};

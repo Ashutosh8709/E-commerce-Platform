@@ -173,22 +173,6 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
-      {
-        path: "/seller",
-        element: (
-          <ProtectedRoute>
-            <SellerStorePage />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "/admin",
-        element: (
-          <ProtectedRoute>
-            <AdminDashboard />
-          </ProtectedRoute>
-        ),
-      },
     ],
   },
   {
@@ -202,6 +186,22 @@ const router = createBrowserRouter([
   {
     path: "/forgot-password",
     element: <ForgotPasswordPage />,
+  },
+  {
+    path: "/seller",
+    element: (
+      <ProtectedRoute>
+        <SellerStorePage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/admin",
+    element: (
+      <ProtectedRoute>
+        <AdminDashboard />
+      </ProtectedRoute>
+    ),
   },
 ]);
 

@@ -1,37 +1,96 @@
 import {
-  Box,
-  Receipt,
-  Truck,
-  Users,
-  TrendingUp,
   LayoutGrid,
+  Package,
+  ShoppingCart,
+  DollarSign,
+  BarChart3,
+  TrendingUp,
+  AlertTriangle,
+  PieChart,
+  PlusCircle,
+  Users,
 } from "lucide-react";
-import { useState, useEffect } from "react";
-import socket from "../../socket";
-import { getAllOrders } from "../../services/orderService";
 import moment from "moment";
+import { useEffect, useState } from "react";
+import socket from "../../socket";
+import {
+  getAdminStats,
+  getAllOrders,
+  getSalesAnalytics,
+} from "../../services/adminService";
 import { handleError, handleSuccess } from "../../utils";
+import { Line, Pie } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  LineElement,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  ArcElement,
+  Tooltip,
+  Legend,
+} from "chart.js";
+
+ChartJS.register(
+  LineElement,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  ArcElement,
+  Tooltip,
+  Legend
+);
 
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState("products");
-  const [recentOrders, setRecentOrders] = useState([]);
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const [stats, setStats] = useState({
+    totalOrders: 0,
+    totalRevenue: 0,
+    lowStockItems: [],
+  });
+  const [products, setProducts] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [salesData, setSalesData] = useState([]);
+  const [categoryData, setCategoryData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const fetchOrder = async () => {
-    const res = await getAllOrders();
-    setRecentOrders(res.data?.data);
+  const fetchInitialData = async () => {
+    try {
+      setLoading(true);
+      const [statsRes, orderRes, analyticsRes] = await Promise.all([
+        getAdminStats(),
+        getAllOrders(),
+        getSalesAnalytics(),
+      ]);
+
+      setStats(statsRes.data?.data);
+      setOrders(orderRes.data?.data || []);
+      setSalesData(analyticsRes.data?.data?.salesByDate || []);
+      setCategoryData(analyticsRes.data?.data?.salesByCategory || []);
+    } catch (err) {
+      handleError("Failed to fetch dashboard data");
+    } finally {
+      setLoading(false);
+    }
   };
+
   useEffect(() => {
-    fetchOrder();
+    fetchInitialData();
   }, []);
 
   useEffect(() => {
     socket.on("order:new", (order) => {
-      setRecentOrders((prev) => [order, ...prev]);
+      setOrders((prev) => [order, ...prev]);
+      setStats((prev) => ({
+        ...prev,
+        totalOrders: prev.totalOrders + 1,
+        totalRevenue: prev.totalRevenue + order.finalAmount,
+      }));
       handleSuccess(`New order placed — ₹${order.totalAmount}`);
     });
 
     socket.on("order:statusUpdated", (update) => {
-      setRecentOrders((prev) =>
+      setOrders((prev) =>
         prev.map((order) =>
           order._id === update.orderId
             ? { ...order, status: update.status }
@@ -41,213 +100,359 @@ export default function AdminDashboard() {
       handleSuccess(`Order updated to: ${update.status}`);
     });
 
+    socket.on("product:lowStock", (data) => {
+      setStats((prev) => ({
+        ...prev,
+        lowStockItems: [...prev.lowStockItems, data],
+      }));
+      handleSuccess(`Low stock alert — ${data.name} (${data.stock} left)`);
+    });
+
     socket.on("disconnect", () => {
       console.warn("Disconnected from socket server");
+    });
+
+    socket.on("connect", () => {
+      console.info("Reconnected — syncing dashboard data");
+      fetchInitialData();
     });
 
     return () => {
       socket.off("order:new");
       socket.off("order:statusUpdated");
+      socket.off("product:lowStock");
+      socket.off("connect");
+      socket.off("disconnect");
     };
   }, []);
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "shipped":
-        return "bg-blue-100 text-blue-800";
-      case "delivered":
-        return "bg-green-100 text-green-800";
-      case "processing":
-        return "bg-yellow-100 text-yellow-800";
-      default:
-        return "bg-slate-100 text-slate-800";
-    }
+  console.log("Sales Data:", salesData);
+  console.log("Category Data:", categoryData);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen text-gray-500">
+        Loading dashboard...
+      </div>
+    );
+  }
+
+  const lineChartData = {
+    labels: salesData.map((d) => moment(d._id).format("MMM DD")),
+    datasets: [
+      {
+        label: "Revenue (₹)",
+        data: salesData.map((d) => d.totalRevenue),
+        fill: true,
+        backgroundColor: "rgba(99, 102, 241, 0.1)",
+        borderColor: "#6366F1",
+        tension: 0.3,
+        pointRadius: 4,
+      },
+    ],
   };
 
-  return (
-    <div className="flex min-h-screen bg-slate-50">
-      <aside className="w-64 bg-white border-r border-slate-200 flex flex-col">
-        <div className="p-6 border-b border-slate-200">
-          <h1 className="text-xl font-bold text-slate-900">Admin Panel</h1>
-        </div>
+  const pieChartData = {
+    labels: categoryData.map((c) => c.category),
+    datasets: [
+      {
+        data: categoryData.map((c) => c.totalRevenue),
+        backgroundColor: ["#4F46E5", "#10B981", "#F59E0B", "#EF4444"],
+        borderWidth: 1,
+      },
+    ],
+  };
 
-        <nav className="flex-1 px-4 py-6 space-y-2">
-          <button
-            onClick={() => setActiveTab("products")}
-            className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-              activeTab === "products"
-                ? "bg-blue-50 text-blue-600"
-                : "text-slate-700 hover:bg-slate-50"
-            }`}
-          >
-            <LayoutGrid size={20} />
-            <span>Products</span>
-          </button>
+  const kpiData = [
+    {
+      title: "Total Revenue",
+      value: `₹${stats?.totalRevenue?.toLocaleString() || 0}`,
+      icon: <DollarSign />,
+      color: "bg-green-100 text-green-700",
+    },
+    {
+      title: "Total Orders",
+      value: stats?.totalOrders || 0,
+      icon: <ShoppingCart />,
+      color: "bg-blue-100 text-blue-700",
+    },
+    {
+      title: "Low Stock Items",
+      value: stats?.lowStockItems?.length || 0,
+      icon: <AlertTriangle />,
+      color: "bg-yellow-100 text-yellow-700",
+    },
+  ];
 
-          <button
-            onClick={() => setActiveTab("inventory")}
-            className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-              activeTab === "inventory"
-                ? "bg-blue-50 text-blue-600"
-                : "text-slate-700 hover:bg-slate-50"
-            }`}
-          >
-            <Box size={20} />
-            <span>Inventory</span>
-          </button>
+  const renderContent = () => {
+    switch (activeTab) {
+      case "dashboard":
+        return (
+          <>
+            {/* KPI Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+              {kpiData.map((kpi, index) => (
+                <div
+                  key={index}
+                  className="bg-white rounded-xl shadow-sm p-5 border border-gray-100 flex items-center gap-4"
+                >
+                  <div className={`p-3 rounded-lg ${kpi.color}`}>
+                    {kpi.icon}
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">{kpi.title}</p>
+                    <p className="text-xl font-semibold text-gray-900">
+                      {kpi.value}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
 
-          <button
-            onClick={() => setActiveTab("orders")}
-            className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-              activeTab === "orders"
-                ? "bg-blue-50 text-blue-600"
-                : "text-slate-700 hover:bg-slate-50"
-            }`}
-          >
-            <Receipt size={20} />
-            <span>Orders</span>
-          </button>
+            {/* Chart Placeholders */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+              <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                  <TrendingUp size={18} /> Sales Overview
+                </h2>
+                <Line data={lineChartData} />
+              </div>
+              <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                  <PieChart size={18} /> Category Distribution
+                </h2>
+                <Pie data={pieChartData} />
+              </div>
+            </div>
 
-          <button
-            onClick={() => setActiveTab("deliveries")}
-            className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-              activeTab === "deliveries"
-                ? "bg-blue-50 text-blue-600"
-                : "text-slate-700 hover:bg-slate-50"
-            }`}
-          >
-            <Truck size={20} />
-            <span>Deliveries</span>
-          </button>
+            {/* Recent Orders */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 mb-8">
+              <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
+                <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                  <ShoppingCart size={18} /> Recent Orders
+                </h2>
+              </div>
+              <table className="w-full">
+                <thead className="bg-gray-50 text-gray-600 text-xs uppercase font-medium">
+                  <tr>
+                    <th className="text-left px-6 py-3">Order ID</th>
+                    <th className="text-left px-6 py-3">Date</th>
+                    <th className="text-left px-6 py-3">Status</th>
+                    <th className="text-left px-6 py-3">Total</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {orders.slice(0, 5).map((order) => (
+                    <tr key={order._id} className="hover:bg-gray-50 transition">
+                      <td className="px-6 py-3 text-sm font-medium text-gray-900">
+                        #{order._id.slice(-6)}
+                      </td>
+                      <td className="px-6 py-3 text-sm text-gray-500">
+                        {moment(order.createdAt).format("MMM DD, YYYY")}
+                      </td>
+                      <td className="px-6 py-3">
+                        <span
+                          className={`px-3 py-1 text-xs font-semibold rounded-full ${
+                            order.status === "delivered"
+                              ? "bg-green-100 text-green-700"
+                              : order.status === "confirmed"
+                              ? "bg-blue-100 text-blue-700"
+                              : "bg-yellow-100 text-yellow-700"
+                          }`}
+                        >
+                          {order.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-3 text-sm text-gray-800 font-semibold">
+                        ₹{order.finalAmount.toLocaleString()}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
 
-          <button
-            onClick={() => setActiveTab("users")}
-            className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-              activeTab === "users"
-                ? "bg-blue-50 text-blue-600"
-                : "text-slate-700 hover:bg-slate-50"
-            }`}
-          >
-            <Users size={20} />
-            <span>Users</span>
-          </button>
+            {/* Low Stock Section */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+              <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
+                <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                  <AlertTriangle size={18} /> Low Stock Products
+                </h2>
+              </div>
+              <ul className="divide-y divide-gray-100">
+                {stats.lowStockItems.length &&
+                  stats?.lowStockItems?.map((item) => (
+                    <li
+                      key={item._id}
+                      className="flex justify-between items-center px-6 py-3 text-sm text-gray-700"
+                    >
+                      <div>
+                        <p className="font-medium">{item.name}</p>
+                        <p className="text-xs text-gray-500">
+                          Seller: {item.Seller?.storeName}
+                        </p>
+                      </div>
+                      <span className="font-semibold text-red-600">
+                        {item.stock} left
+                      </span>
+                    </li>
+                  ))}
+              </ul>
+            </div>
+          </>
+        );
 
-          <button
-            onClick={() => setActiveTab("analytics")}
-            className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-              activeTab === "analytics"
-                ? "bg-blue-50 text-blue-600"
-                : "text-slate-700 hover:bg-slate-50"
-            }`}
-          >
-            <TrendingUp size={20} />
-            <span>Analytics</span>
-          </button>
-        </nav>
-      </aside>
-
-      <main className="flex-1 p-8">
-        <h1 className="text-3xl font-bold text-slate-900 mb-8">Dashboard</h1>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-lg p-6 shadow-sm">
-            <p className="text-sm font-medium text-slate-600 mb-2">
-              Total Products
+      case "orders":
+        return (
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+              <ShoppingCart size={20} /> All Orders
+            </h2>
+            <p className="text-gray-500 mb-4">
+              📦 Manage and track customer orders.
             </p>
-            <p className="text-3xl font-bold text-slate-900">1,250</p>
+            <div className="flex justify-center items-center h-48 text-gray-400">
+              [Orders Management Table]
+            </div>
           </div>
+        );
 
-          <div className="bg-white rounded-lg p-6 shadow-sm">
-            <p className="text-sm font-medium text-slate-600 mb-2">
-              Total Orders
-            </p>
-            <p className="text-3xl font-bold text-slate-900">
-              {recentOrders.length}
-            </p>
-          </div>
-
-          <div className="bg-white rounded-lg p-6 shadow-sm">
-            <p className="text-sm font-medium text-slate-600 mb-2">
-              Active Users
-            </p>
-            <p className="text-3xl font-bold text-slate-900">5,680</p>
-          </div>
-        </div>
-
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-slate-900 mb-4">
-            Quick Actions
-          </h2>
-          <div className="flex gap-4">
-            <button className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition-colors">
-              Add Product
+      case "products":
+        return (
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+              <Package size={20} /> Products
+            </h2>
+            <button className="mb-4 px-4 py-2 flex items-center gap-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 transition">
+              <PlusCircle size={16} /> Add Product
             </button>
-            <button className="px-6 py-2.5 bg-white hover:bg-slate-50 text-slate-900 text-sm font-semibold border border-slate-200 rounded-lg transition-colors">
-              View Orders
-            </button>
-          </div>
-        </div>
-
-        <div>
-          <h2 className="text-2xl font-bold text-slate-900 mb-4">
-            Recent Orders
-          </h2>
-          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
             <table className="w-full">
-              <thead className="bg-slate-50 border-b border-slate-200">
+              <thead className="bg-gray-50 text-gray-600 text-xs uppercase font-medium">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                    Order ID
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                    Customer
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                    Date
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                    Total
-                  </th>
+                  <th className="text-left px-4 py-2">Name</th>
+                  <th className="text-left px-4 py-2">Category</th>
+                  <th className="text-left px-4 py-2">Price</th>
+                  <th className="text-left px-4 py-2">Stock</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-200">
-                {recentOrders.map((order, index) => (
-                  <tr
-                    key={order._id}
-                    className="hover:bg-slate-50 transition-colors"
-                  >
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
-                      #{order._id.slice(-6).toUpperCase()}
+              <tbody className="divide-y divide-gray-100">
+                {products.map((p, i) => (
+                  <tr key={i} className="hover:bg-gray-50 transition">
+                    <td className="px-4 py-2 text-sm text-gray-800">
+                      {p.name}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
-                      {order.owner}
+                    <td className="px-4 py-2 text-sm text-gray-600">
+                      {p.category}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
-                      {moment(order.createdAt).format("MMMM D, YYYY")}
+                    <td className="px-4 py-2 text-sm text-gray-600">
+                      ₹{p.price}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <span
-                        className={`px-3 py-1 inline-flex text-xs font-semibold rounded-full ${getStatusColor(
-                          order.status
-                        )}`}
-                      >
-                        {order.status.charAt(0).toUpperCase() +
-                          order.status.slice(1)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
-                      ${order.totalAmount.toFixed(2)}
+                    <td className="px-4 py-2 text-sm text-gray-600">
+                      {p.stock}
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+        );
+
+      case "analytics":
+        return (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+              <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-3">
+                <TrendingUp size={18} /> Revenue Trends
+              </h2>
+              <div className="flex justify-center items-center h-48 text-gray-400">
+                📈 [Revenue Chart Placeholder]
+              </div>
+            </div>
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+              <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-3">
+                <BarChart3 size={18} /> Category Sales
+              </h2>
+              <div className="flex justify-center items-center h-48 text-gray-400">
+                📊 [Category Chart Placeholder]
+              </div>
+            </div>
+          </div>
+        );
+
+      case "users":
+        return (
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+              <Users size={20} /> Users
+            </h2>
+            <table className="w-full">
+              <thead className="bg-gray-50 text-gray-600 text-xs uppercase font-medium">
+                <tr>
+                  <th className="text-left px-4 py-2">Name</th>
+                  <th className="text-left px-4 py-2">Email</th>
+                  <th className="text-left px-4 py-2">Orders</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {users.map((u, i) => (
+                  <tr key={i} className="hover:bg-gray-50 transition">
+                    <td className="px-4 py-2 text-sm text-gray-800">
+                      {u.name}
+                    </td>
+                    <td className="px-4 py-2 text-sm text-gray-600">
+                      {u.email}
+                    </td>
+                    <td className="px-4 py-2 text-sm text-gray-600">
+                      {u.orders}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        );
+
+      default:
+        return (
+          <p className="text-gray-500 text-center py-10">
+            Select a section from the sidebar.
+          </p>
+        );
+    }
+  };
+
+  return (
+    <div className="flex min-h-screen bg-gray-50">
+      {/* Sidebar */}
+      <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
+        <div className="p-6 border-b border-gray-200">
+          <h1 className="text-2xl font-bold text-indigo-600">Admin Panel</h1>
         </div>
-      </main>
+        <nav className="flex-1 px-4 py-6 space-y-2">
+          {[
+            { name: "Dashboard", icon: LayoutGrid },
+            { name: "Orders", icon: ShoppingCart },
+            { name: "Products", icon: Package },
+            { name: "Analytics", icon: BarChart3 },
+          ].map((item) => (
+            <button
+              key={item.name}
+              onClick={() => setActiveTab(item.name.toLowerCase())}
+              className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                activeTab === item.name.toLowerCase()
+                  ? "bg-indigo-50 text-indigo-600"
+                  : "text-gray-700 hover:bg-gray-100"
+              }`}
+            >
+              <item.icon size={20} />
+              <span>{item.name}</span>
+            </button>
+          ))}
+        </nav>
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 p-8">{renderContent()}</main>
     </div>
   );
 }
