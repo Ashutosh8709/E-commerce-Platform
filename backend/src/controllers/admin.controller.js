@@ -76,49 +76,112 @@ const getAdminStats = asyncHandler(async (req, res) => {
     )
   );
 });
+
 const getSalesAnalytics = asyncHandler(async (req, res) => {
-  const salesByDate = await Order.aggregate([
+  const [result] = await Order.aggregate([
     { $match: { paymentStatus: "paid" } },
     {
-      $group: {
-        _id: {
-          $dateToString: { format: "%Y-%m-%d", date: "$createdAt" },
-        },
-        totalRevenue: { $sum: "$finalAmount" },
-      },
-    },
-    { $sort: { _id: 1 } },
-  ]);
-  const salesByCategory = await Order.aggregate([
-    { $unwind: "$products" },
-    {
-      $lookup: {
-        from: "products",
-        localField: "products.productId",
-        foreignField: "_id",
-        as: "productInfo",
-      },
-    },
-    { $unwind: "$productInfo" },
-    {
-      $group: {
-        _id: "$productInfo.category",
-        totalRevenue: { $sum: "$products.priceAtAddition" },
-      },
-    },
-    { $project: { category: "$_id", totalRevenue: 1, _id: 0 } },
-  ]);
+      $facet: {
+        salesByDate: [
+          {
+            $group: {
+              _id: {
+                $dateToString: { format: "%Y-%m-%d", date: "$createdAt" },
+              },
+              totalRevenue: { $sum: "$finalAmount" },
+            },
+          },
+          { $sort: { _id: 1 } },
+        ],
 
+        salesByCategory: [
+          { $unwind: "$products" },
+          {
+            $lookup: {
+              from: "products",
+              localField: "products.productId",
+              foreignField: "_id",
+              as: "productInfo",
+            },
+          },
+          { $unwind: "$productInfo" },
+          {
+            $group: {
+              _id: "$productInfo.category",
+              totalRevenue: { $sum: "$products.priceAtAddition" },
+            },
+          },
+          { $project: { category: "$_id", totalRevenue: 1, _id: 0 } },
+        ],
+
+        topSellingProducts: [
+          { $unwind: "$products" },
+          {
+            $group: {
+              _id: "$products.productId",
+              totalSold: { $sum: "$products.quantity" },
+            },
+          },
+          {
+            $lookup: {
+              from: "products",
+              localField: "_id",
+              foreignField: "_id",
+              as: "productInfo",
+            },
+          },
+          { $unwind: "$productInfo" },
+          {
+            $project: {
+              _id: 0,
+              productId: "$_id",
+              productName: "$productInfo.name",
+              category: "$productInfo.category",
+              totalSold: 1,
+            },
+          },
+          { $sort: { totalSold: -1 } },
+          { $limit: 10 },
+        ],
+
+        orderByStatus: [
+          {
+            $group: {
+              _id: "$status",
+              count: { $sum: 1 },
+            },
+          },
+          {
+            $project: {
+              _id: 0,
+              status: "$_id",
+              count: 1,
+            },
+          },
+        ],
+        avgOrderValue: [
+          {
+            $group: {
+              _id: null,
+              totalRevenue: { $sum: "$finalAmount" },
+              totalOrders: { $sum: 1 },
+            },
+          },
+          {
+            $project: {
+              _id: 0,
+              avgOrderValue: { $divide: ["$totalRevenue", "$totalOrders"] },
+            },
+          },
+        ],
+      },
+    },
+  ]);
   return res
     .status(200)
-    .json(
-      new ApiResponse(
-        200,
-        { salesByDate, salesByCategory },
-        "Fetch Analytics Successfully"
-      )
-    );
+    .json(new ApiResponse(200, result, "Fetch Analytics Successfully"));
 });
+
 const updateOrderStatus = asyncHandler(async (req, res) => {});
 const addProduct = asyncHandler(async (req, res) => {});
 const updateProduct = asyncHandler(async (req, res) => {});
