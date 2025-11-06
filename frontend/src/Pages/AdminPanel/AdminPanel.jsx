@@ -81,10 +81,11 @@ export default function AdminDashboard() {
   useEffect(() => {
     socket.on("order:new", (order) => {
       setOrders((prev) => [order, ...prev]);
+
       setStats((prev) => ({
         ...prev,
         totalOrders: prev.totalOrders + 1,
-        totalRevenue: prev.totalRevenue + order.finalAmount,
+        totalRevenue: prev?.totalRevenue + order?.totalAmount,
       }));
       handleSuccess(`New order placed — ₹${order.totalAmount}`);
     });
@@ -125,9 +126,6 @@ export default function AdminDashboard() {
       socket.off("disconnect");
     };
   }, []);
-
-  console.log("Sales Data:", salesData);
-  console.log("Category Data:", categoryData);
 
   if (loading) {
     return (
@@ -215,13 +213,17 @@ export default function AdminDashboard() {
                 <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
                   <TrendingUp size={18} /> Sales Overview
                 </h2>
-                <Line data={lineChartData} />
+                <div className="flex justify-center items-center h-48 text-gray-400">
+                  <Line data={lineChartData} />
+                </div>
               </div>
               <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                 <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
                   <PieChart size={18} /> Category Distribution
                 </h2>
-                <Pie data={pieChartData} />
+                <div className="flex justify-center items-center h-48 text-gray-400">
+                  <Pie data={pieChartData} />
+                </div>
               </div>
             </div>
 
@@ -264,7 +266,7 @@ export default function AdminDashboard() {
                         </span>
                       </td>
                       <td className="px-6 py-3 text-sm text-gray-800 font-semibold">
-                        ₹{order.finalAmount.toLocaleString()}
+                        ₹{order.finalAmount?.toLocaleString()}
                       </td>
                     </tr>
                   ))}
@@ -365,7 +367,7 @@ export default function AdminDashboard() {
                 <TrendingUp size={18} /> Revenue Trends
               </h2>
               <div className="flex justify-center items-center h-48 text-gray-400">
-                📈 [Revenue Chart Placeholder]
+                <Line data={lineChartData} />
               </div>
             </div>
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
@@ -373,42 +375,9 @@ export default function AdminDashboard() {
                 <BarChart3 size={18} /> Category Sales
               </h2>
               <div className="flex justify-center items-center h-48 text-gray-400">
-                📊 [Category Chart Placeholder]
+                <Pie data={pieChartData} />
               </div>
             </div>
-          </div>
-        );
-
-      case "users":
-        return (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
-              <Users size={20} /> Users
-            </h2>
-            <table className="w-full">
-              <thead className="bg-gray-50 text-gray-600 text-xs uppercase font-medium">
-                <tr>
-                  <th className="text-left px-4 py-2">Name</th>
-                  <th className="text-left px-4 py-2">Email</th>
-                  <th className="text-left px-4 py-2">Orders</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {users.map((u, i) => (
-                  <tr key={i} className="hover:bg-gray-50 transition">
-                    <td className="px-4 py-2 text-sm text-gray-800">
-                      {u.name}
-                    </td>
-                    <td className="px-4 py-2 text-sm text-gray-600">
-                      {u.email}
-                    </td>
-                    <td className="px-4 py-2 text-sm text-gray-600">
-                      {u.orders}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
           </div>
         );
 
@@ -431,9 +400,9 @@ export default function AdminDashboard() {
         <nav className="flex-1 px-4 py-6 space-y-2">
           {[
             { name: "Dashboard", icon: LayoutGrid },
+            { name: "Analytics", icon: BarChart3 },
             { name: "Orders", icon: ShoppingCart },
             { name: "Products", icon: Package },
-            { name: "Analytics", icon: BarChart3 },
           ].map((item) => (
             <button
               key={item.name}
