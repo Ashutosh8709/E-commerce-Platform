@@ -19,10 +19,11 @@ import {
   getSalesAnalytics,
 } from "../../services/adminService";
 import { handleError, handleSuccess } from "../../utils";
-import { Line, Pie } from "react-chartjs-2";
+import { Line, Pie, Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   LineElement,
+  BarElement,
   CategoryScale,
   LinearScale,
   PointElement,
@@ -33,6 +34,7 @@ import {
 
 ChartJS.register(
   LineElement,
+  BarElement,
   CategoryScale,
   LinearScale,
   PointElement,
@@ -52,6 +54,9 @@ export default function AdminDashboard() {
   const [orders, setOrders] = useState([]);
   const [salesData, setSalesData] = useState([]);
   const [categoryData, setCategoryData] = useState([]);
+  const [avgOrderValue, setAvgOrderValue] = useState(0);
+  const [orderByStatus, setOrderByStatus] = useState([]);
+  const [topSellingProducts, setTopSellingProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const fetchInitialData = async () => {
@@ -62,11 +67,15 @@ export default function AdminDashboard() {
         getAllOrders(),
         getSalesAnalytics(),
       ]);
-
       setStats(statsRes.data?.data);
       setOrders(orderRes.data?.data || []);
       setSalesData(analyticsRes.data?.data?.salesByDate || []);
       setCategoryData(analyticsRes.data?.data?.salesByCategory || []);
+      setAvgOrderValue(
+        analyticsRes.data?.data?.avgOrderValue[0]?.avgOrderValue || 0
+      );
+      setOrderByStatus(analyticsRes.data?.data?.orderByStatus || 0);
+      setTopSellingProducts(analyticsRes.data?.data?.topSellingProducts || 0);
     } catch (err) {
       handleError("Failed to fetch dashboard data");
     } finally {
@@ -156,6 +165,35 @@ export default function AdminDashboard() {
       {
         data: categoryData.map((c) => c.totalRevenue),
         backgroundColor: ["#4F46E5", "#10B981", "#F59E0B", "#EF4444"],
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const topProductsChartData = {
+    labels: topSellingProducts.map((p) => p.productName),
+    datasets: [
+      {
+        label: "Units Sold",
+        data: topSellingProducts.map((p) => p.totalSold),
+        backgroundColor: "rgba(37, 99, 235, 0.6)",
+        borderRadius: 6,
+      },
+    ],
+  };
+
+  const orderStatusData = {
+    labels: orderByStatus.map((s) => s.status),
+    datasets: [
+      {
+        data: orderByStatus.map((s) => s.count),
+        backgroundColor: [
+          "#4ADE80",
+          "#FACC15",
+          "#F87171",
+          "#60A5FA",
+          "#A78BFA",
+        ],
         borderWidth: 1,
       },
     ],
@@ -361,21 +399,127 @@ export default function AdminDashboard() {
 
       case "analytics":
         return (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-              <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-3">
-                <TrendingUp size={18} /> Revenue Trends
-              </h2>
-              <div className="flex justify-center items-center h-48 text-gray-400">
-                <Line data={lineChartData} />
+          <div className="space-y-8">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-wrap items-center justify-around text-center">
+              <div>
+                <p className="text-gray-500 text-sm">Average Order Value</p>
+                <h3 className="text-2xl font-semibold text-indigo-600">
+                  ₹{avgOrderValue.toFixed(0)}
+                </h3>
+              </div>
+              <div>
+                <p className="text-gray-500 text-sm">Total Revenue</p>
+                <h3 className="text-2xl font-semibold text-green-600">
+                  ₹{stats?.totalRevenue?.toLocaleString() || 0}
+                </h3>
+              </div>
+              <div>
+                <p className="text-gray-500 text-sm">Orders Processed</p>
+                <h3 className="text-2xl font-semibold text-blue-600">
+                  {stats?.totalOrders || 0}
+                </h3>
               </div>
             </div>
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-              <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-3">
-                <BarChart3 size={18} /> Category Sales
-              </h2>
-              <div className="flex justify-center items-center h-48 text-gray-400">
-                <Pie data={pieChartData} />
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-3">
+                  <TrendingUp size={18} /> Revenue Trends
+                </h2>
+                <div className="flex justify-center items-center h-64 text-gray-400">
+                  <Line
+                    data={lineChartData}
+                    options={{
+                      responsive: true,
+                      plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                          callbacks: { label: (ctx) => `₹${ctx.parsed.y}` },
+                        },
+                      },
+                      scales: {
+                        y: { beginAtZero: true, ticks: { color: "#6B7280" } },
+                        x: { ticks: { color: "#6B7280" } },
+                      },
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Category Sales */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-3">
+                  <PieChart size={18} /> Sales by Category
+                </h2>
+                <div className="flex justify-center items-center h-64 text-gray-400">
+                  <Pie
+                    data={pieChartData}
+                    options={{
+                      plugins: {
+                        legend: {
+                          position: "bottom",
+                          labels: { color: "#374151" },
+                        },
+                        tooltip: {
+                          callbacks: { label: (ctx) => `₹${ctx.parsed}` },
+                        },
+                      },
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Row 2 - Top Products & Order Status */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Top Selling Products */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-3">
+                  <BarChart3 size={18} /> Top Selling Products
+                </h2>
+                <div className="flex justify-center items-center h-65 text-gray-400">
+                  <Bar
+                    data={topProductsChartData}
+                    options={{
+                      indexAxis: "y",
+                      plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                          callbacks: { label: (ctx) => `${ctx.parsed.x} sold` },
+                        },
+                      },
+                      scales: {
+                        x: { beginAtZero: true, ticks: { color: "#6B7280" } },
+                        y: { ticks: { color: "#6B7280" } },
+                      },
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Order Status Distribution */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-3">
+                  <Package size={18} /> Orders by Status
+                </h2>
+                <div className="flex justify-center items-center h-64 text-gray-400">
+                  <Pie
+                    data={orderStatusData}
+                    options={{
+                      plugins: {
+                        legend: {
+                          position: "bottom",
+                          labels: { color: "#374151" },
+                        },
+                        tooltip: {
+                          callbacks: {
+                            label: (ctx) => `${ctx.label}: ${ctx.parsed}`,
+                          },
+                        },
+                      },
+                    }}
+                  />
+                </div>
               </div>
             </div>
           </div>
