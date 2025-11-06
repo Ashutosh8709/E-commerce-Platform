@@ -252,7 +252,22 @@ export default function AdminDashboard() {
                   <TrendingUp size={18} /> Sales Overview
                 </h2>
                 <div className="flex justify-center items-center h-48 text-gray-400">
-                  <Line data={lineChartData} />
+                  <Line
+                    data={lineChartData}
+                    options={{
+                      responsive: true,
+                      plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                          callbacks: { label: (ctx) => `₹${ctx.parsed.y}` },
+                        },
+                      },
+                      scales: {
+                        y: { beginAtZero: true, ticks: { color: "#6B7280" } },
+                        x: { ticks: { color: "#6B7280" } },
+                      },
+                    }}
+                  />
                 </div>
               </div>
               <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
@@ -260,7 +275,20 @@ export default function AdminDashboard() {
                   <PieChart size={18} /> Category Distribution
                 </h2>
                 <div className="flex justify-center items-center h-48 text-gray-400">
-                  <Pie data={pieChartData} />
+                  <Pie
+                    data={pieChartData}
+                    options={{
+                      plugins: {
+                        legend: {
+                          position: "bottom",
+                          labels: { color: "#374151" },
+                        },
+                        tooltip: {
+                          callbacks: { label: (ctx) => `₹${ctx.parsed}` },
+                        },
+                      },
+                    }}
+                  />
                 </div>
               </div>
             </div>
