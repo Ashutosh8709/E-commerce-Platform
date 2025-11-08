@@ -1,4 +1,3 @@
-import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
@@ -30,7 +29,8 @@ import { persistQueryClient } from "@tanstack/react-query-persist-client";
 import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
 import OrderTrackingPage from "./Pages/OrderTracking/OrderTracking.jsx";
 import SellerStorePage from "./Pages/SellerDashboard/SellerDashboard.jsx";
-import AdminDashboard from "./Pages/AdminPanel/AdminPanel.jsx";
+import AdminLayout from "./Layout/AdminLayout.jsx";
+import AdminTabsRouter from "./components/AdminTabsRouter.jsx";
 
 const queryClient = new QueryClient();
 
@@ -195,13 +195,23 @@ const router = createBrowserRouter([
       </ProtectedRoute>
     ),
   },
+  // {
+  //   path: "/admin",
+  //   element: (
+  //     <ProtectedRoute>
+  //       <AdminDashboard />
+  //     </ProtectedRoute>
+  //   ),
+  // },
   {
-    path: "/admin",
-    element: (
-      <ProtectedRoute>
-        <AdminDashboard />
-      </ProtectedRoute>
-    ),
+    path: "/",
+    element: <AdminLayout />,
+    children: [
+      {
+        path: "/admin/:tab",
+        element: <AdminTabsRouter />,
+      },
+    ],
   },
 ]);
 

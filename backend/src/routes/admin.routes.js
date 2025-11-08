@@ -17,7 +17,7 @@ router.use(verifyJwt, verifyAdmin);
 
 router.get("/stats", getAdminStats);
 router.get("/orders", getAllOrders);
-router.patch("/orders/:id/status", updateOrderStatus);
+router.patch("/orders/:orderId/status", updateOrderStatus);
 router.post("/products", addProduct);
 router.patch("/products/:id", updateProduct);
 router.delete("/products/:id", deleteProduct);
