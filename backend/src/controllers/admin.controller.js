@@ -221,6 +221,7 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, order, "Order Status updated"));
 });
+
 const addProduct = asyncHandler(async (req, res) => {});
 const updateProduct = asyncHandler(async (req, res) => {});
 const deleteProduct = asyncHandler(async (req, res) => {});

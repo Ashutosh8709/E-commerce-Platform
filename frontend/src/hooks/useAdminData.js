@@ -6,6 +6,7 @@ import {
   getAllOrders,
   getSalesAnalytics,
 } from "../services/adminService";
+import { get } from "../services/productService";
 
 import { handleSuccess, handleError } from "../utils";
 
