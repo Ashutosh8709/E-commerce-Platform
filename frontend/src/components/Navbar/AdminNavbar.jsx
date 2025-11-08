@@ -12,9 +12,7 @@ function AdminNavbar({ setIsSidebarOpen }) {
           >
             <Menu size={20} />
           </button>
-          <h1 className="text-lg font-semibold text-gray-800">
-            Admin Dashboard
-          </h1>
+          <h1 className="text-lg font-semibold text-gray-800">Admin Panel</h1>
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-indigo-200 flex items-center justify-center font-bold text-indigo-700">
               A
