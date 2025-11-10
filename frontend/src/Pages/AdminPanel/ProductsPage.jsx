@@ -8,39 +8,27 @@ import {
   Edit3,
   Trash2,
 } from "lucide-react";
-import axios from "axios";
 import { handleError, handleSuccess } from "../../utils";
+import { useProducts } from "../../hooks/useProducts";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { deleteProd } from "../../services/productService";
 
 function ProductsPage() {
-  const [products, setProducts] = useState([]);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(8);
-  const [pagination, setPagination] = useState({});
-  const [loading, setLoading] = useState(false);
   const [sortField, setSortField] = useState("name");
   const [sortOrder, setSortOrder] = useState("asc");
+  const limit = 8;
 
-  // 🔥 Fetch data
-  const fetchProducts = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.get(
-        `${BASE_URL}/product?page=${page}&limit=${limit}`
-      );
-      const { products, pagination } = response.data.data;
-      setProducts(products || []);
-      setPagination(pagination || {});
-    } catch (err) {
-      handleError("Failed to fetch products");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    fetchProducts();
-  }, [page, limit]);
+  const { products, pagination, isLoading } = useProducts(
+    page,
+    limit,
+    "admin-products"
+  );
+
+  const loading = isLoading;
 
   // 🔍 Filter + Sort
   const filteredProducts = useMemo(() => {
@@ -68,7 +56,6 @@ function ProductsPage() {
     return filtered;
   }, [products, search, sortField, sortOrder]);
 
-  // 🧩 Handlers
   const toggleSort = (field) => {
     if (sortField === field) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
@@ -78,14 +65,24 @@ function ProductsPage() {
     }
   };
 
+  const deleteProductMutation = useMutation({
+    mutationFn: async (id) => {
+      await deleteProd(id);
+    },
+    onSuccess: () => {
+      handleSuccess("Product deleted");
+      queryClient.invalidateQueries(["admin-products"]);
+    },
+    onError: () => handleError("Failed to delete product"),
+  });
+
   const handleDelete = (id) => {
-    handleSuccess(`Deleted product ${id.slice(-6)}`);
-    // TODO: integrate delete API
+    deleteProductMutation.mutate(id);
   };
 
   const handleEdit = (id) => {
-    handleSuccess(`Edit product ${id.slice(-6)}`);
-    // TODO: open modal
+    handleSuccess(`Editing product ${id.slice(-6)}`);
+    // open modal or redirect here
   };
 
   return (
@@ -174,9 +171,9 @@ function ProductsPage() {
                       "—"}
                   </td>
                   <td className="px-4 py-2 text-gray-900 font-semibold">
-                    ₹{p.offeredPrice.toLocaleString()}
+                    ₹{p?.offeredPrice?.toLocaleString() || "Not Given"}
                     <span className="text-gray-400 line-through ml-1 text-xs">
-                      ₹{p.originalPrice.toLocaleString()}
+                      ₹{p?.originalPrice?.toLocaleString() || "Not Given"}
                     </span>
                   </td>
                   <td
