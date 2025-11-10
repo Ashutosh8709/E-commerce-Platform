@@ -1,7 +1,11 @@
-import React from "react";
 import { Menu } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
 
 function AdminNavbar({ setIsSidebarOpen }) {
+  const { logout } = useAuth();
+  const handleLogout = async () => {
+    await logout();
+  };
   return (
     <>
       <div className="flex flex-col flex-1">
@@ -14,9 +18,12 @@ function AdminNavbar({ setIsSidebarOpen }) {
           </button>
           <h1 className="text-lg font-semibold text-gray-800">Admin Panel</h1>
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-indigo-200 flex items-center justify-center font-bold text-indigo-700">
-              A
-            </div>
+            <button
+              onClick={handleLogout}
+              className="flex items-center justify-center text-red-700 cursor-pointer"
+            >
+              logout
+            </button>
           </div>
         </header>
       </div>

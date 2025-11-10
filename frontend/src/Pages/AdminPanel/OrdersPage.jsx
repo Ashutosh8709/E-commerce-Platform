@@ -1,8 +1,8 @@
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { ShoppingCart, Search, Eye, Trash2, RefreshCw } from "lucide-react";
 import moment from "moment";
 import { useAdminData } from "../../hooks/useAdminData";
-import { handleSuccess, handleError } from "../../utils";
+import { handleSuccess } from "../../utils";
 
 function OrdersPage() {
   const { orders, loading } = useAdminData();

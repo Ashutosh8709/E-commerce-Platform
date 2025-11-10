@@ -1,19 +1,5 @@
-import React from "react";
 import { useAdminData } from "../../hooks/useAdminData";
-import {
-  LayoutGrid,
-  Package,
-  ShoppingCart,
-  DollarSign,
-  BarChart3,
-  TrendingUp,
-  AlertTriangle,
-  PieChart,
-  PlusCircle,
-  Menu,
-  X,
-} from "lucide-react";
-import { Line, Pie, Bar } from "react-chartjs-2";
+import { Package, BarChart3, TrendingUp, PieChart } from "lucide-react";
 import {
   Chart as ChartJS,
   LineElement,
@@ -43,14 +29,7 @@ import OrderStatusPieChart from "../../components/Admin/Analytics/OrderStatusPie
 import TopSeellingBarChart from "../../components/Admin/Analytics/TopSeellingBarChart";
 
 function AnalyticsPage() {
-  const {
-    avgOrderValue,
-    stats,
-    lineChartData,
-    pieChartData,
-    topProductsChartData,
-    orderStatusData,
-  } = useAdminData();
+  const { avgOrderValue, stats } = useAdminData();
   return (
     <div className="space-y-8 py-8">
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-wrap items-center justify-around text-center">
@@ -104,7 +83,7 @@ function AnalyticsPage() {
         {/* Order Status Distribution */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
           <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-3">
-            <Package size={18} /> Orders by Status
+            <Package size={18} /> Orders by Status (Paid)
           </h2>
           <OrderStatusPieChart />
         </div>
