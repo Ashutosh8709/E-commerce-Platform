@@ -67,13 +67,16 @@ function ProductsPage() {
 
   const deleteProductMutation = useMutation({
     mutationFn: async (id) => {
-      await deleteProd(id);
+      const res = await deleteProd(id);
+      return res;
     },
-    onSuccess: () => {
-      handleSuccess("Product deleted");
+    onSuccess: (res) => {
+      handleSuccess(res?.data?.message);
       queryClient.invalidateQueries(["admin-products"]);
     },
-    onError: () => handleError("Failed to delete product"),
+    onError: (error) => {
+      handleError(error?.response?.data?.message || "Failed to delete product");
+    },
   });
 
   const handleDelete = (id) => {

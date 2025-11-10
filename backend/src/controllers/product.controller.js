@@ -187,11 +187,18 @@ const deleteProduct = asyncHandler(async (req, res) => {
   }
 
   try {
-    await Promise.all([
+    const keys = await client.keys("products:page:*");
+    const deletePromises = [
       client.del(`product:${productId}`),
       client.del("newArrivals:products"),
       client.del("products:featured:list"),
-    ]);
+    ];
+
+    if (keys.length > 0) deletePromises.push(client.del(keys));
+
+    await Promise.all(deletePromises);
+
+    console.log("Cache invalidated successfully");
   } catch (err) {
     console.warn("Redis invalidation failed:", err.message);
   }
