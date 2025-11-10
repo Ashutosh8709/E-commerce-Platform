@@ -18,12 +18,12 @@ export default function ProtectedRoute({ children }) {
     }
     return <Navigate to="/login" replace />;
   }
-  // else if (user?.role == "admin") {
-  //   if (userLoggedOut) {
-  //     setTimeout(() => setUserLoggedout(true), 0);
-  //     return <Navigate to="/" replace />;
-  //   }
-  //   return <Navigate to="/admin/dashboard" replace />;
-  // }
+  if (user?.role == "admin") {
+    if (userLoggedOut) {
+      setTimeout(() => setUserLoggedout(true), 0);
+      return <Navigate to="/" replace />;
+    }
+    return <Navigate to="/admin/dashboard" replace />;
+  }
   return children;
 }
