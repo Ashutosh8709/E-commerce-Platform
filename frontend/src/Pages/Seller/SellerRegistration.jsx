@@ -7,7 +7,6 @@ import {
   Phone,
   FileText,
   Image,
-  ArrowLeft,
   Check,
   AlertCircle,
   PercentCircle,
