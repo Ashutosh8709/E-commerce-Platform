@@ -192,6 +192,10 @@ const router = createBrowserRouter([
     path: "/seller",
     element: <SellerRegistrationPage />,
   },
+  {
+    path: "/seller/dashboard",
+    element: <SellerStorePage />,
+  },
   // {
   //   path: "/admin",
   //   element: (

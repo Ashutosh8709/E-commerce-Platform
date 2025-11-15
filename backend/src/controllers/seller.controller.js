@@ -79,4 +79,47 @@ const registerStore = asyncHandler(async (req, res) => {
   }
 });
 
-export { registerStore };
+const addBankDetails = asyncHandler(async (req, res) => {
+  const userId = req.user?._id;
+
+  const { accountNumber, ifscCode, bankName, upiId } = req.body;
+
+  if (!accountNumber || !ifscCode || !bankName) {
+    throw new ApiError(400, "Account Number, IFSC, and Bank Name are required");
+  }
+
+  const accountRegex = /^[0-9]{9,18}$/;
+  if (!accountRegex.test(accountNumber)) {
+    throw new ApiError(400, "Invalid account number format");
+  }
+
+  const ifscRegex = /^[A-Z]{4}0[A-Z0-9]{6}$/;
+  if (!ifscRegex.test(ifscCode.toUpperCase())) {
+    throw new ApiError(400, "Invalid IFSC code format");
+  }
+
+  const upiRegex = /^[\w.-]{3,}@[a-zA-Z]{3,}$/;
+  if (upiId && !upiRegex.test(upiId)) {
+    throw new ApiError(400, "Invalid UPI ID format");
+  }
+
+  const seller = await Seller.findOne({ sellerId: userId });
+  if (!seller) {
+    throw new ApiError(404, "Seller not found");
+  }
+
+  seller.bankDetails = {
+    accountNumber,
+    bankName,
+    ifscCode: ifscCode.toUpperCase(),
+    upiId: upiId || "",
+  };
+
+  await seller.save();
+
+  return res
+    .status(200)
+    .json(new ApiResPonse(200, {}, "Bank details saved successfully"));
+});
+
+export { registerStore, addBankDetails };
