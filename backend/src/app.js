@@ -25,6 +25,7 @@ import wishlistRouter from "./routes/wishlist.routes.js";
 import orderRouter from "./routes/order.routes.js";
 import addressRouter from "./routes/address.routes.js";
 import adminRouter from "./routes/admin.routes.js";
+import sellerRouter from "./routes/seller.routes.js";
 
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/cart", cartRouter);
@@ -34,6 +35,7 @@ app.use("/api/v1/wishlist", wishlistRouter);
 app.use("/api/v1/order", orderRouter);
 app.use("/api/v1/address", addressRouter);
 app.use("/api/v1/admin", adminRouter);
+app.use("/api/v1/seller", sellerRouter);
 
 // http://localhost:8080/api/v1/users/register
 app.use(errorHandler);

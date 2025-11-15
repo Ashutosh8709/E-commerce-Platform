@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { verifyJwt } from "../middlewares/auth.middleware.js";
-import { verifyAdmin } from "../middlewares/verifyAdmin.js";
+import { verifyAdmin } from "../middlewares/verifyAdmin.middleware.js";
 
 const router = Router();
 import {
