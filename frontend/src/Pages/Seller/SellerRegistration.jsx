@@ -12,6 +12,7 @@ import {
   AlertCircle,
   PercentCircle,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 function SellerRegistrationPage({ onSwitchToLogin, onSuccess }) {
   const [formData, setFormData] = useState({
@@ -208,14 +209,6 @@ function SellerRegistrationPage({ onSwitchToLogin, onSuccess }) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-green-50 to-teal-50 py-12 px-4">
       <div className="max-w-3xl mx-auto">
-        <button
-          onClick={onSwitchToLogin}
-          className="flex items-center gap-2 text-gray-600 hover:text-blue-600 mb-6 transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to Login
-        </button>
-
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           <div className="bg-gradient-to-r from-blue-600 to-teal-600 p-8 text-white">
             <div className="flex items-center gap-4 mb-4">
@@ -498,12 +491,12 @@ function SellerRegistrationPage({ onSwitchToLogin, onSuccess }) {
         <div className="text-center mt-6">
           <p className="text-gray-600">
             Already have a store?{" "}
-            <button
-              onClick={onSwitchToLogin}
+            <Link
+              to={"/login"}
               className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
             >
               Sign in
-            </button>
+            </Link>
           </p>
         </div>
       </div>
