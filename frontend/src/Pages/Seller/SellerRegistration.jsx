@@ -10,6 +10,7 @@ import {
   ArrowLeft,
   Check,
   AlertCircle,
+  PercentCircle,
 } from "lucide-react";
 
 function SellerRegistrationPage({ onSwitchToLogin, onSuccess }) {
@@ -19,6 +20,7 @@ function SellerRegistrationPage({ onSwitchToLogin, onSuccess }) {
     address: "",
     email: "",
     phone: "",
+    gstNumber: "",
   });
 
   const [logoFile, setLogoFile] = useState(null);
@@ -385,48 +387,75 @@ function SellerRegistrationPage({ onSwitchToLogin, onSuccess }) {
                   )}
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Email Address *
-                  </label>
-                  <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input
-                      type="email"
-                      name="email"
-                      placeholder="store@example.com"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      onBlur={() => handleBlur("email")}
-                      className={`pl-12 ${getInputClassName("email")}`}
-                    />
+                <div className="flex flex-col md:flex-row gap-6">
+                  {/* Email */}
+                  <div className="w-1/2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Email Address *
+                    </label>
+                    <div className="relative">
+                      <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                      <input
+                        type="email"
+                        name="email"
+                        placeholder="store@example.com"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        onBlur={() => handleBlur("email")}
+                        className={`pl-12 ${getInputClassName("email")}`}
+                      />
+                    </div>
+                    {touched.email && errors.email && (
+                      <p className="text-red-600 text-sm mt-1 ml-1">
+                        {errors.email}
+                      </p>
+                    )}
                   </div>
-                  {touched.email && errors.email && (
-                    <p className="text-red-600 text-sm mt-1 ml-1">
-                      {errors.email}
-                    </p>
-                  )}
-                </div>
 
+                  {/* Phone */}
+                  <div className="w-1/2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Phone Number *
+                    </label>
+                    <div className="relative">
+                      <Phone className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                      <input
+                        type="tel"
+                        name="phone"
+                        placeholder="+1 (555) 123-4567"
+                        value={formData.phone}
+                        onChange={handleInputChange}
+                        onBlur={() => handleBlur("phone")}
+                        className={`pl-12 ${getInputClassName("phone")}`}
+                      />
+                    </div>
+                    {touched.phone && errors.phone && (
+                      <p className="text-red-600 text-sm mt-1 ml-1">
+                        {errors.phone}
+                      </p>
+                    )}
+                  </div>
+                </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Phone Number *
+                    GST Number *
                   </label>
                   <div className="relative">
-                    <Phone className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <PercentCircle className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
                       type="tel"
                       name="phone"
-                      placeholder="+1 (555) 123-4567"
-                      value={formData.phone}
+                      placeholder="Enter your GST Number"
+                      value={formData.gstNumber}
                       onChange={handleInputChange}
-                      onBlur={() => handleBlur("phone")}
-                      className={`pl-12 ${getInputClassName("phone")}`}
+                      onBlur={() => handleBlur("gstNumber")}
+                      className={`pl-12 ${getInputClassName("gstNumber")}`}
                     />
                   </div>
-                  {touched.phone && errors.phone && (
+                  {touched.gstNumber && errors.gstNumber && (
                     <p className="text-red-600 text-sm mt-1 ml-1">
-                      {errors.phone}
+                      {" "}
+                      {errors.gstNumber}{" "}
                     </p>
                   )}
                 </div>
