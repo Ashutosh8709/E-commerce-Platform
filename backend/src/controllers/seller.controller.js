@@ -1,8 +1,9 @@
 import { ApiError } from "../utils/ApiError.js";
-import { ApiResPonse } from "../utils/ApiResponse.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/AsyncHandler.js";
 import { User } from "../models/user.model.js";
 import { Seller } from "../models/seller.model.js";
+import { Product } from "../models/product.model.js";
 
 const registerStore = asyncHandler(async (req, res) => {
   const userId = req.user?._id;
@@ -70,8 +71,8 @@ const registerStore = asyncHandler(async (req, res) => {
     session.endSession();
 
     return res
-      .status(201)
-      .json(new ApiResPonse(201, newSeller[0], "Store created successfully"));
+      .status(200)
+      .json(new ApiResponse(200, newSeller[0], "Store created successfully"));
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
@@ -122,4 +123,29 @@ const addBankDetails = asyncHandler(async (req, res) => {
     .json(new ApiResPonse(200, {}, "Bank details saved successfully"));
 });
 
-export { registerStore, addBankDetails };
+const getStore = asyncHandler(async (req, res) => {
+  const userId = req.user?._id;
+
+  const store = await Seller.findOne({ sellerId: userId }).select(
+    "-bankDetails.accountNumber -bankDetails.ifscCode"
+  );
+  if (!store) throw new ApiError(404, "No store found");
+
+  return res.status(200).json(200, store, "Store fetched Successfully");
+});
+
+const getProductsSeller = asyncHandler(async (req, res) => {
+  const userId = req.user?._id;
+
+  const products = await Product.find({ sellerId: userId });
+
+  if (!products || products.length === 0) {
+    throw new ApiError(404, "No Product Found");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, products, "Products Fetched Successfully"));
+});
+
+export { registerStore, addBankDetails, getStore, getProductsSeller };

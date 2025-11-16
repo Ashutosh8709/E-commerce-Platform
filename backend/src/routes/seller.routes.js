@@ -8,7 +8,7 @@ import {
 
 const router = Router();
 
-router.post("/register", verifyJwt, verifySeller, registerStore);
+router.post("/register", verifyJwt, registerStore);
 router.post("/addBank", verifyJwt, verifySeller, addBankDetails);
 
 export default router;

@@ -1,30 +1,27 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Store,
-  Upload,
   MapPin,
   Mail,
   Phone,
   FileText,
-  Image,
   Check,
   AlertCircle,
   PercentCircle,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { register } from "../../services/sellerService";
+import { handleSuccess, handleError } from "../../utils";
 
-function SellerRegistrationPage({ onSwitchToLogin, onSuccess }) {
+function SellerRegistrationPage() {
   const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    address: "",
+    storeName: "",
+    storeDescription: "",
+    storeAddress: "",
     email: "",
     phone: "",
     gstNumber: "",
   });
-
-  const [logoFile, setLogoFile] = useState(null);
-  const [logoPreview, setLogoPreview] = useState(null);
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -45,59 +42,35 @@ function SellerRegistrationPage({ onSwitchToLogin, onSuccess }) {
     validateField(field);
   };
 
-  const handleLogoUpload = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        setErrors((prev) => ({
-          ...prev,
-          logo: "Logo file must be less than 5MB",
-        }));
-        return;
-      }
-
-      if (!file.type.startsWith("image/")) {
-        setErrors((prev) => ({ ...prev, logo: "Please upload an image file" }));
-        return;
-      }
-
-      setLogoFile(file);
-      setErrors((prev) => ({ ...prev, logo: "" }));
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setLogoPreview(e.target?.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   const validateField = (field) => {
     const newErrors = { ...errors };
 
     switch (field) {
-      case "name":
-        if (!formData.name.trim()) {
-          newErrors.name = "Store name is required";
-        } else if (formData.name.length < 3) {
-          newErrors.name = "Store name must be at least 3 characters";
+      case "storeName":
+        if (!formData.storeName.trim()) {
+          newErrors.storeName = "Store name is required";
+        } else if (formData.storeName.length < 3) {
+          newErrors.storeName = "Store name must be at least 3 characters";
         } else {
-          delete newErrors.name;
+          delete newErrors.storeName;
         }
         break;
-      case "description":
-        if (formData.description && formData.description.length < 20) {
-          newErrors.description =
+      case "storeDescription":
+        if (
+          formData.storeDescription &&
+          formData.storeDescription.length < 20
+        ) {
+          newErrors.storeDescription =
             "Description should be at least 20 characters";
         } else {
-          delete newErrors.description;
+          delete newErrors.storeDescription;
         }
         break;
-      case "address":
-        if (!formData.address.trim()) {
-          newErrors.address = "Store address is required";
+      case "storeAddress":
+        if (!formData.storeAddress.trim()) {
+          newErrors.storeAddress = "Store address is required";
         } else {
-          delete newErrors.address;
+          delete newErrors.storeAddress;
         }
         break;
       case "email":
@@ -123,6 +96,14 @@ function SellerRegistrationPage({ onSwitchToLogin, onSuccess }) {
           delete newErrors.phone;
         }
         break;
+
+      case "gstNumber":
+        if (formData.gstNumber && formData.gstNumber.length !== 15) {
+          newErrors.gstNumber = "GST number must be 15 characters";
+        } else {
+          delete newErrors.gstNumber;
+        }
+        break;
     }
 
     setErrors(newErrors);
@@ -130,37 +111,45 @@ function SellerRegistrationPage({ onSwitchToLogin, onSuccess }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     Object.keys(formData).forEach((field) => {
       setTouched((prev) => ({ ...prev, [field]: true }));
+
       validateField(field);
     });
-
     const hasErrors = Object.keys(errors).length > 0;
     const hasEmptyFields =
-      !formData.name || !formData.address || !formData.email || !formData.phone;
-
+      !formData?.storeName ||
+      !formData?.storeAddress ||
+      !formData?.email ||
+      !formData?.phone;
     if (!hasErrors && !hasEmptyFields) {
       setIsSubmitting(true);
       setSubmitError(null);
 
       try {
-        console.log("Store registration submitted:", {
-          ...formData,
-          logo: logoFile ? logoFile.name : "No logo",
-        });
+        const res = await register(formData);
 
-        await new Promise((resolve) => setTimeout(resolve, 1500));
+        console.log(res.data);
+
+        if (
+          !res.data?.data ||
+          !res.data?.success ||
+          res.data?.statusCode !== 200
+        ) {
+          setSubmitError("Store creation failed. Please try again.");
+          handleError(res.data.message);
+          return;
+        }
 
         setSubmitSuccess(true);
+        handleSuccess(res.data?.message || "Store created successfully");
 
         setTimeout(() => {
-          if (onSuccess) {
-            onSuccess();
-          }
+          if (onSuccess) onSuccess();
         }, 2000);
       } catch (error) {
         setSubmitError("Failed to register store. Please try again.");
+        handleError(error?.response?.data?.message);
       } finally {
         setIsSubmitting(false);
       }
@@ -194,12 +183,12 @@ function SellerRegistrationPage({ onSwitchToLogin, onSuccess }) {
             Your store has been submitted for review. We'll notify you once it's
             approved and ready to go live.
           </p>
-          <button
-            onClick={onSwitchToLogin}
+          <Link
+            to={"/login"}
             className="w-full bg-blue-600 text-white font-semibold py-3 px-6 rounded-xl hover:bg-blue-700 transition-colors"
           >
             Return to Login
-          </button>
+          </Link>
         </div>
       </div>
     );
@@ -250,12 +239,12 @@ function SellerRegistrationPage({ onSwitchToLogin, onSuccess }) {
                     <Store className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
                       type="text"
-                      name="name"
+                      name="storeName"
                       placeholder="Enter your store name"
-                      value={formData.name}
+                      value={formData.storeName}
                       onChange={handleInputChange}
-                      onBlur={() => handleBlur("name")}
-                      className={`pl-12 ${getInputClassName("name")}`}
+                      onBlur={() => handleBlur("storeName")}
+                      className={`pl-12 ${getInputClassName("storeName")}`}
                     />
                   </div>
                   {touched.name && errors.name && (
@@ -272,78 +261,20 @@ function SellerRegistrationPage({ onSwitchToLogin, onSuccess }) {
                   <div className="relative">
                     <FileText className="absolute left-4 top-4 w-5 h-5 text-gray-400" />
                     <textarea
-                      name="description"
+                      name="storeDescription"
                       placeholder="Tell customers about your store..."
-                      value={formData.description}
+                      value={formData.storeDescription}
                       onChange={handleInputChange}
-                      onBlur={() => handleBlur("description")}
+                      onBlur={() => handleBlur("storeDescription")}
                       rows={4}
                       className={`pl-12 ${getInputClassName(
-                        "description"
+                        "storeDescription"
                       )} resize-none`}
                     />
                   </div>
                   {touched.description && errors.description && (
                     <p className="text-red-600 text-sm mt-1 ml-1">
                       {errors.description}
-                    </p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Store Logo
-                  </label>
-                  <div className="flex items-start gap-4">
-                    <div className="relative">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleLogoUpload}
-                        className="hidden"
-                        id="logo-upload"
-                      />
-                      <label
-                        htmlFor="logo-upload"
-                        className="w-32 h-32 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all duration-300"
-                      >
-                        {logoPreview ? (
-                          <img
-                            src={logoPreview}
-                            alt="Logo preview"
-                            className="w-full h-full object-cover rounded-xl"
-                          />
-                        ) : (
-                          <>
-                            <Upload className="w-8 h-8 text-gray-400 mb-2" />
-                            <span className="text-xs text-gray-500 text-center px-2">
-                              Upload Logo
-                            </span>
-                          </>
-                        )}
-                      </label>
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm text-gray-600 mb-2">
-                        <Image className="w-4 h-4 inline mr-1" />
-                        Upload your store logo
-                      </p>
-                      <ul className="text-xs text-gray-500 space-y-1">
-                        <li>• JPG, PNG or GIF format</li>
-                        <li>• Maximum size: 5MB</li>
-                        <li>• Square images work best</li>
-                      </ul>
-                      {logoFile && (
-                        <p className="text-sm text-green-600 mt-2 font-medium">
-                          <Check className="w-4 h-4 inline mr-1" />
-                          {logoFile.name}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                  {errors.logo && (
-                    <p className="text-red-600 text-sm mt-1 ml-1">
-                      {errors.logo}
                     </p>
                   )}
                 </div>
@@ -364,12 +295,12 @@ function SellerRegistrationPage({ onSwitchToLogin, onSuccess }) {
                     <MapPin className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
                       type="text"
-                      name="address"
+                      name="storeAddress"
                       placeholder="123 Main Street, City, State, ZIP"
-                      value={formData.address}
+                      value={formData.storeAddress}
                       onChange={handleInputChange}
-                      onBlur={() => handleBlur("address")}
-                      className={`pl-12 ${getInputClassName("address")}`}
+                      onBlur={() => handleBlur("storeAddress")}
+                      className={`pl-12 ${getInputClassName("storeAddress")}`}
                     />
                   </div>
                   {touched.address && errors.address && (
@@ -435,8 +366,7 @@ function SellerRegistrationPage({ onSwitchToLogin, onSuccess }) {
                   <div className="relative">
                     <PercentCircle className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
-                      type="tel"
-                      name="phone"
+                      name="gstNumber"
                       placeholder="Enter your GST Number"
                       value={formData.gstNumber}
                       onChange={handleInputChange}
@@ -462,17 +392,17 @@ function SellerRegistrationPage({ onSwitchToLogin, onSuccess }) {
             </div>
 
             <div className="flex gap-4">
-              <button
-                type="button"
-                onClick={onSwitchToLogin}
-                className="flex-1 bg-gray-200 text-gray-800 font-semibold py-3 px-6 rounded-xl hover:bg-gray-300 transition-colors"
+              <Link
+                to={"/login"}
+                className="flex-1 text-center bg-gray-200 text-gray-800 font-semibold py-3 px-6 rounded-xl hover:bg-gray-300 transition-colors"
               >
                 Cancel
-              </button>
+              </Link>
               <button
                 type="submit"
+                onClick={() => handleSubmit}
                 disabled={isSubmitting}
-                className="flex-1 bg-gradient-to-r from-blue-600 to-teal-600 text-white font-semibold py-3 px-6 rounded-xl hover:from-blue-700 hover:to-teal-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+                className="flex-1 bg-gradient-to-r from-blue-600 to-teal-600 text-white font-semibold py-3 px-6 rounded-xl hover:from-blue-700 hover:to-teal-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl cursor-pointer"
               >
                 {isSubmitting ? (
                   <span className="flex items-center justify-center gap-2">
