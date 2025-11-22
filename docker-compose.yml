@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  server:
+    build: ./backend
+    container_name: ecommerce-server
+    ports:
+      - "8080:8080"
+    networks:
+      - fullstack-net
+    restart: unless-stopped
+  client:
+    build: ./frontend
+    container_name: ecommerce-frontend
+    ports:
+      - "3000:3000"
+    networks:
+      - fullstack-net
+    depends_on:
+      - server
+    restart: unless-stopped
+
+networks:
+  fullstack-net:
+    driver: bridge
