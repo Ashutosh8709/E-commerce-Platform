@@ -28,7 +28,7 @@ connectDB()
   .then(() => {
     console.log("MONGODB connected successfuly!!");
     server.listen(process.env.PORT || 8080, () => {
-      console.log(`Server is running on port ${process.env.PORT}`);
+      console.log(`Server is running on the port ${process.env.PORT}`);
     });
     app.on("error", (error) => {
       console.log("ERRR", error);
