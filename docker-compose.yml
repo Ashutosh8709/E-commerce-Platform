@@ -14,7 +14,7 @@ services:
     restart: unless-stopped
   server:
     build: ./backend
-    container_name: ecommerce-server
+    container_name: ecommerce-backend
     ports:
       - "8080:8080"
     env_file:
