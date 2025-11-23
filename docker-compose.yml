@@ -1,19 +1,36 @@
 version: "3.9"
 
 services:
+  redis:
+    image: redis/redis-stack:latest
+    container_name: ecommerce-redis
+    ports:
+      - "6379:6379"
+      - "8001:8001"
+    volumes:
+      - redis-data:/data
+    networks:
+      - fullstack-net
+    restart: unless-stopped
   server:
     build: ./backend
     container_name: ecommerce-server
     ports:
       - "8080:8080"
+    env_file:
+      - ./backend/.env
     networks:
       - fullstack-net
+    depends_on:
+      - redis
     restart: unless-stopped
   client:
     build: ./frontend
     container_name: ecommerce-frontend
     ports:
       - "3000:3000"
+    env_file:
+      - frontend/.env
     networks:
       - fullstack-net
     depends_on:
@@ -23,3 +40,6 @@ services:
 networks:
   fullstack-net:
     driver: bridge
+
+volumes:
+  redis-data:
