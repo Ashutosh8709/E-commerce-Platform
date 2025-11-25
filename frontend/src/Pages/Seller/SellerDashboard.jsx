@@ -239,7 +239,7 @@ export default function SellerStorePage() {
                             }
                             className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           >
-                            <option value="">Select...</option>
+                            <option value="">Select</option>
                             <option value="Electronics">Electronics</option>
                             <option value="Fashion">Fashion</option>
                             <option value="Home & Kitchen">
