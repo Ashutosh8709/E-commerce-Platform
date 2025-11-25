@@ -243,7 +243,7 @@ export default function SellerStorePage() {
                             <option value="Electronics">Electronics</option>
                             <option value="Fashion">Fashion</option>
                             <option value="Home & Kitchen">
-                              Home & Kitchen
+                              Home && Kitchen
                             </option>
                             <option value="Books">Books</option>
                             <option value="Sports">Sports</option>
