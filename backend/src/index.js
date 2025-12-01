@@ -27,7 +27,7 @@ io.on("connection", (socket) => {
 connectDB()
   .then(() => {
     console.log("MONGODB connected successfuly!!");
-    server.listen(process.env.PORT || 8080, () => {
+    server.listen(process.env.PORT || 8000, () => {
       console.log(`Server is running on the port ${process.env.PORT}`);
     });
     app.on("error", (error) => {
