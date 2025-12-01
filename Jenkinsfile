@@ -46,7 +46,6 @@ pipeline{
                     docker_push()
                 }
             }
-            
         }
         stage("Test"){
             steps{
