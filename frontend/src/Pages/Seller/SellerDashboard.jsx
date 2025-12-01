@@ -249,7 +249,7 @@ export default function SellerStorePage() {
                             <option value="Sports">Sports</option>
                             <option value="Beauty">Beauty</option>
                             <option value="Toys">Toys</option>
-                            <option value="Other">Other</option>
+                            <option value="Others">Others</option>
                           </select>
                         </div>
                         <div>
