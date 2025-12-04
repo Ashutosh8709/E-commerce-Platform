@@ -27,8 +27,6 @@ services:
     container_name: ecommerce-frontend
     ports:
       - "8081:80"
-    env_file:
-      - ./frontend/.env
     networks:
       - fullstack-net
     depends_on:
