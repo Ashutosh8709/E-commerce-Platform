@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   redis:
     image: redis/redis-stack:latest
@@ -12,8 +10,8 @@ services:
     networks:
       - fullstack-net
     restart: unless-stopped
-  server:
-    image: ashutosh8709/ecommerce-backend:latest
+  backend:
+    build: ./backend
     container_name: ecommerce-backend
     ports:
       - "8000:8000"
@@ -24,17 +22,17 @@ services:
     depends_on:
       - redis
     restart: unless-stopped
-  client:
-    image: ashutosh8709/ecommerce-frontend:latest
+  frontend:
+    build: ./frontend
     container_name: ecommerce-frontend
     ports:
-      - "3000:3000"
+      - "8081:80"
     env_file:
-      - frontend/.env
+      - ./frontend/.env
     networks:
       - fullstack-net
     depends_on:
-      - server
+      - backend
     restart: unless-stopped
 
 networks:
