@@ -17,7 +17,7 @@ function LandingPage() {
         >
           <div className="max-w-lg space-y-4">
             <h1 className="text-4xl md:text-5xl font-black tracking-tight">
-              Create Your Home
+              Elevate Your Home
             </h1>
             <p className="text-base md:text-lg">
               Discover curated collections of furniture and decor to transform
