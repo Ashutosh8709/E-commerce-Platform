@@ -90,10 +90,6 @@ export const useOrder = () => {
     mutationFn: async (selectedAddress) => {
       const res = await placeOrder(selectedAddress);
       const order = res.data.data;
-      console.log(
-        "Frontend Razorpay Key:",
-        import.meta.env.VITE_RAZORPAY_KEY_ID
-      );
 
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,

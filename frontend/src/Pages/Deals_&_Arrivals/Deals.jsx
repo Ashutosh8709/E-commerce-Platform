@@ -32,8 +32,6 @@ function DealsNewArrivalsPage() {
 
   const newArrivals = data?.data?.data || [];
 
-  console.log(newArrivals);
-
   const hotDeals = [
     {
       id: 1,
