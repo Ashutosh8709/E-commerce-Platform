@@ -11,7 +11,7 @@ services:
       - fullstack-net
     restart: unless-stopped
   backend:
-    build: ./backend
+    image: ashutosh8709/ecommerce-backend:latest
     container_name: ecommerce-backend
     ports:
       - "8000:8000"
@@ -23,7 +23,7 @@ services:
       - redis
     restart: unless-stopped
   frontend:
-    build: ./frontend
+    image: ashutosh8709/ecommerce-frontend:latest
     container_name: ecommerce-frontend
     ports:
       - "8081:80"
