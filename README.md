@@ -160,7 +160,7 @@ Emit ORDER_STATUS_UPDATED
 ### **DevOps**
 - Docker  
 - Jenkins CI/CD  
-- Kubernetes (Minikube / Cloud)  
+- Kubernetes (Kind / Cloud)  
 
 ---
 
