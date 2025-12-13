@@ -79,12 +79,6 @@ This document contains complete technical documentation for deployment, developm
 
 ---
 
-### <mark>Project Deployment Flow:</mark>
-
-<img src="https://github.com/DevMadhup/Wanderlust-Mega-Project/blob/main/Assets/DevSecOps%2BGitOps.gif" />
-
-#
-
 # 🏗 3. System Architecture
 
 ```
@@ -122,6 +116,12 @@ This document contains complete technical documentation for deployment, developm
                      │ API + Worker Pods + Redis  │
                      └────────────────────────────┘
 ```
+
+### <mark>Project Deployment Flow:</mark>
+
+<img src="https://github.com/DevMadhup/Wanderlust-Mega-Project/blob/main/Assets/DevSecOps%2BGitOps.gif" />
+
+#
 
 ---
 
