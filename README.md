@@ -1,40 +1,44 @@
-# 🚀 SwiftCart – Full-Stack E‑Commerce Platform  
-### **Production‑Grade Architecture | Event‑Driven | Real‑Time Updates | Docker | Jenkins | Kubernetes | MLOps‑Ready**  
+# 🚀 SwiftCart – Full-Stack E‑Commerce Platform
+
+### **Production‑Grade Architecture | Event‑Driven | Real‑Time Updates | Docker | Jenkins | Kubernetes | MLOps‑Ready**
+
 ### **Author: Ashutosh Kumar**
 
 ---
 
 # 🧭 Table of Contents
-1. Overview  
-2. Core Features  
-3. System Architecture  
-4. Event‑Driven Workflow  
-5. Tech Stack  
-6. Microservices Breakdown  
-7. API Overview  
-8. Authentication & Authorization  
-9. Real‑Time Order Tracking (Socket.IO)  
-10. Caching Strategy (Redis)  
-11. Seller Onboarding Flow  
-12. Database Schema Overview  
-13. CI/CD Pipeline (Docker → Jenkins → Kubernetes)  
-14. Deployment Architecture  
-15. Installation (Local + Production)  
-16. Folder Structure  
-17. Future Enhancements  
+
+1. Overview
+2. Core Features
+3. System Architecture
+4. Event‑Driven Workflow
+5. Tech Stack
+6. Microservices Breakdown
+7. API Overview
+8. Authentication & Authorization
+9. Real‑Time Order Tracking (Socket.IO)
+10. Caching Strategy (Redis)
+11. Seller Onboarding Flow
+12. Database Schema Overview
+13. CI/CD Pipeline (Docker → Jenkins → Kubernetes)
+14. Deployment Architecture
+15. Installation (Local + Production)
+16. Folder Structure
+17. Future Enhancements
 
 ---
 
-# 📌 1. Overview  
+# 📌 1. Overview
+
 **SwiftCart** is a **production‑ready full‑stack E‑commerce platform** supporting:
 
-- User shopping  
-- Seller onboarding & store management  
-- Real‑time admin dashboard  
-- Event‑driven order lifecycle  
-- Razorpay payment integration  
-- Redis caching  
-- Horizontal scalability with Kubernetes  
+- User shopping
+- Seller onboarding & store management
+- Real‑time admin dashboard
+- Event‑driven order lifecycle
+- Razorpay payment integration
+- Redis caching
+- Horizontal scalability with Kubernetes
 
 This document contains complete technical documentation for deployment, development, scaling, and architecture.
 
@@ -43,99 +47,111 @@ This document contains complete technical documentation for deployment, developm
 # ✨ 2. Core Features
 
 ### 🛍 Customer Features
-- Product browsing, filtering, searching  
-- Cart and wishlist  
-- Address management  
-- Razorpay-based checkout  
-- Order tracking  
+
+- Product browsing, filtering, searching
+- Cart and wishlist
+- Address management
+- Razorpay-based checkout
+- Order tracking
 
 ### 🧑‍💼 Seller Features
-- Store registration + GST verification  
-- Product CRUD  
-- Inventory management  
-- Store analytics  
+
+- Store registration + GST verification
+- Product CRUD
+- Inventory management
+- Store analytics
 
 ### 🛠 Admin Features
-- Real‑time order board  
-- Insights dashboard  
-- Manage sellers, customers, and inventory  
-- Update order statuses  
+
+- Real‑time order board
+- Insights dashboard
+- Manage sellers, customers, and inventory
+- Update order statuses
 
 ### ⚡ Platform Features
-- Event‑driven backend  
-- Redis caching for high-performance reads  
-- WebSocket order updates  
-- Containerized microservices  
-- CI/CD pipeline  
-- Kubernetes deployment  
+
+- Event‑driven backend
+- Redis caching for high-performance reads
+- WebSocket order updates
+- Containerized microservices
+- CI/CD pipeline
+- Kubernetes deployment
 
 ---
+
+### <mark>Project Deployment Flow:</mark>
+
+<img src="https://github.com/DevMadhup/Wanderlust-Mega-Project/blob/main/Assets/DevSecOps%2BGitOps.gif" />
+
+#
 
 # 🏗 3. System Architecture
 
 ```
                     ┌────────────────────────┐
-                    │        Frontend         │
-                    │  React + Vite + RTK     │
+                    │        Frontend        │
+                    │  React + Vite + RTK    │
                     └─────────────┬──────────┘
-                                  │ HTTPS/WS                    
+                                  │ HTTPS/WS
                     ┌─────────────▼──────────────┐
-                    │        API Gateway          │
-                    │      Express.js Server      │
+                    │        API Gateway         │
+                    │      Express.js Server     │
                     └─────────────┬──────────────┘
-                     REST / Events │  Socket.IO
+                    REST / Events │  Socket.IO
             ┌──────────────────────▼─────────────────────┐
-            │                Backend Services             │
+            │                Backend Services            │
             │  User • Auth • Seller • Cart • Orders •    │
             │  Product • Payment • Analytics             │
             └──────────────────────┬─────────────────────┘
                                    │ MongoDB Queries
                      ┌─────────────▼──────────────┐
-                     │         MongoDB             │
+                     │         MongoDB            │
                      └────────────────────────────┘
                                    │
                      ┌─────────────▼──────────────┐
-                     │          Redis Cache        │
+                     │          Redis Cache       │
                      └────────────────────────────┘
                                    │
                      ┌─────────────▼──────────────┐
-                     │      Message/Event Bus      │
-                     │        (Socket.IO)          │
+                     │      Message/Event Bus     │
+                     │        (Socket.IO)         │
                      └────────────────────────────┘
                                    │
                      ┌─────────────▼──────────────┐
-                     │     Kubernetes Cluster      │
-                     │ API + Worker Pods + Redis   │
+                     │     Kubernetes Cluster     │
+                     │ API + Worker Pods + Redis  │
                      └────────────────────────────┘
 ```
 
 ---
 
-# ⚡ 4. Event‑Driven Workflow  
+# ⚡ 4. Event‑Driven Workflow
 
-### Example: New Order Flow  
+### Example: New Order Flow
+
 ```
-User Places Order  
+User Places Order
       │
-      ▼  
-ORDER_PLACED Event  
-      │  
+      ▼
+ORDER_PLACED Event
+      │
       ├── Notify Admin Dashboard (Socket.IO)
-      ├── Update Inventory Service  
-      ├── Update Seller Dashboard  
+      ├── Update Inventory Service
+      ├── Update Seller Dashboard
       └── Trigger Payment Verification
 ```
 
-### Example: Order Status Update  
+### Example: Order Status Update
+
 ```
-Admin → Update Status  
-      │  
-      ▼  
-Emit ORDER_STATUS_UPDATED  
-      │  
-      ├── Notify User  
-      ├── Notify Seller  
-      └── Update Analytics  
+Admin → Update Status
+      │
+      ▼
+Emit ORDER_STATUS_UPDATED
+      │
+      ├── Notify User
+      ├── Notify Seller
+      └── Update Analytics
 ```
 
 ---
@@ -143,45 +159,54 @@ Emit ORDER_STATUS_UPDATED
 # 🧰 5. Tech Stack
 
 ### **Frontend**
-- React + Vite  
-- TailwindCSS  
-- React Query  
-- Socket.IO Client  
-- Framer Motion  
+
+- React + Vite
+- TailwindCSS
+- React Query
+- Socket.IO Client
+- Framer Motion
 
 ### **Backend**
-- Node.js + Express  
-- MongoDB + Mongoose  
-- Redis (Caching)  
-- Socket.IO  
-- Razorpay Payments  
-- JWT Authentication  
+
+- Node.js + Express
+- MongoDB + Mongoose
+- Redis (Caching)
+- Socket.IO
+- Razorpay Payments
+- JWT Authentication
 
 ### **DevOps**
-- Docker  
-- Jenkins CI/CD  
-- Kubernetes (Kind / Cloud)  
+
+- Docker
+- Jenkins CI/CD
+- Kubernetes (Kind / Cloud)
 
 ---
 
-# 🔥 6. Microservices Breakdown  
+# 🔥 6. Microservices Breakdown
 
-### ✔ User Service  
+### ✔ User Service
+
 Handles registration, login, roles, seller onboarding.
 
-### ✔ Product Service  
+### ✔ Product Service
+
 CRUD, categories, deals, featured/new arrivals (Redis cached).
 
-### ✔ Cart Service  
+### ✔ Cart Service
+
 Add/update/remove items.
 
-### ✔ Order Service  
+### ✔ Order Service
+
 Order creation, payment, tracking, event broadcasting.
 
-### ✔ Payment Service  
+### ✔ Payment Service
+
 Razorpay integration + secure verification.
 
-### ✔ Admin Service  
+### ✔ Admin Service
+
 Real-time analytics, seller verification, order management.
 
 ---
@@ -204,11 +229,13 @@ Real-time analytics, seller verification, order management.
 # 🔐 8. Authentication & Authorization
 
 ### Role-Based Access:
-- **User** → Shop & order  
-- **Seller** → Products, inventory  
-- **Admin** → Full access  
+
+- **User** → Shop & order
+- **Seller** → Products, inventory
+- **Admin** → Full access
 
 Token structure:
+
 ```
 {
   userId: "...",
@@ -222,21 +249,24 @@ Token structure:
 # 🔴 9. Real‑Time Order Tracking (Socket.IO)
 
 ### Events:
+
 ```
-order:new  
-order:statusUpdated  
-inventory:update  
-admin:alert  
+order:new
+order:statusUpdated
+inventory:update
+admin:alert
 ```
 
 ### Backend Emit Example:
+
 ```js
 global.io.emit("order:new", orderPayload);
 ```
 
 ### Frontend Listener:
+
 ```js
-socket.on("order:new", (data) => setOrders(prev => [data, ...prev]));
+socket.on("order:new", (data) => setOrders((prev) => [data, ...prev]));
 ```
 
 ---
@@ -244,16 +274,18 @@ socket.on("order:new", (data) => setOrders(prev => [data, ...prev]));
 # ⚙️ 10. Caching Strategy (Redis)
 
 ### Cached items:
-- Featured products  
-- New arrivals  
-- Category-wise listings  
-- Seller profile meta  
+
+- Featured products
+- New arrivals
+- Category-wise listings
+- Seller profile meta
 
 ### TTL:
+
 ```
-newArrivals → 1 hour  
-featured → 2 hours  
-categories → 24 hours  
+newArrivals → 1 hour
+featured → 2 hours
+categories → 24 hours
 ```
 
 ---
@@ -261,29 +293,31 @@ categories → 24 hours
 # 🧑‍💼 11. Seller Onboarding Flow
 
 ### Registration Flow:
-1. User clicks **Become a Seller**  
+
+1. User clicks **Become a Seller**
 2. Provide:
-   - Store name  
-   - GST Number  
-   - Phone  
-   - Email  
-   - Address  
-3. Admin verifies seller  
-4. Role changes → `"seller"`  
+   - Store name
+   - GST Number
+   - Phone
+   - Email
+   - Address
+3. Admin verifies seller
+4. Role changes → `"seller"`
 5. Seller gets access to:
-   - Add products  
-   - Inventory  
-   - Order management  
-   - Earnings dashboard  
+   - Add products
+   - Inventory
+   - Order management
+   - Earnings dashboard
 
 ### Seller Schema:
+
 ```
-storeName  
-gstNumber  
-ownerUserId  
-bankDetails  
-kycStatus  
-verificationStatus  
+storeName
+gstNumber
+ownerUserId
+bankDetails
+kycStatus
+verificationStatus
 ```
 
 ---
@@ -291,16 +325,17 @@ verificationStatus
 # 🗄 12. Database Schema Overview
 
 ### Collections:
+
 ```
-User  
-Seller  
-Product  
-Category  
-Order  
-Payment  
-Cart  
-Review  
-Address  
+User
+Seller
+Product
+Category
+Order
+Payment
+Cart
+Review
+Address
 ```
 
 ---
@@ -311,12 +346,12 @@ Address
 Developer Push → GitHub
           │
           ▼
-Jenkins Pulls Repo  
+Jenkins Pulls Repo
           │
-          ├── Run Tests  
-          ├── Build Docker Image  
-          ├── Push to Registry  
-          └── Deploy to Kubernetes  
+          ├── Run Tests
+          ├── Build Docker Image
+          ├── Push to Registry
+          └── Deploy to Kubernetes
 ```
 
 ---
@@ -324,18 +359,20 @@ Jenkins Pulls Repo
 # ☸️ 14. Kubernetes Deployment
 
 ### Pod Structure:
+
 ```
-api-deployment  
-socket-deployment  
-mongo-statefulset  
-redis-deployment  
-```  
+api-deployment
+socket-deployment
+mongo-statefulset
+redis-deployment
+```
 
 ### Services:
+
 ```
-ClusterIP → API  
-ClusterIP → Redis  
-NodePort → Frontend  
+ClusterIP → API
+ClusterIP → Redis
+NodePort → Frontend
 ```
 
 ---
@@ -343,6 +380,7 @@ NodePort → Frontend
 # 💻 15. Installation
 
 ## Local Setup
+
 ```
 git clone repo
 cd backend && npm install
@@ -351,11 +389,13 @@ npm run dev
 ```
 
 ## Docker Setup
+
 ```
 docker-compose up --build
 ```
 
 ## Kubernetes
+
 ```
 kubectl apply -f k8s/
 ```
@@ -387,18 +427,20 @@ kubectl apply -f k8s/
 ---
 
 # 🚀 17. Future Enhancements
-- AI-powered recommendation engine  
-- Product ranking using ML models  
-- Fraud detection  
-- Advanced analytics  
-- Chatbot for support  
-- Seller payouts automation  
+
+- AI-powered recommendation engine
+- Product ranking using ML models
+- Fraud detection
+- Advanced analytics
+- Chatbot for support
+- Seller payouts automation
 
 ---
 
-# 🙌 Author  
+# 🙌 Author
+
 **Ashutosh Kumar**  
-Full‑Stack Developer | MLOPS | DevOps Enthusiast  
+Full‑Stack Developer | MLOPS | DevOps Enthusiast
 
 ---
 
