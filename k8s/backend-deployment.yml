@@ -22,15 +22,14 @@ spec:
           ports:
             - containerPort: 8000
           envFrom:
-            - configMapRef:
-              name: backend-config
-
             - secretRef:
-              name: backend-secret
+                name: backend-secret
+            - configMapRef:
+                name: backend-config
 
           readinessProbe:
             httpGet:
-              path: /api/v1/users/current-user
+              path: /api/v1/health
               port: 8000
 
             initialDelaySeconds: 10
