@@ -4,10 +4,12 @@ metadata:
   name: frontend
   namespace: ecommerce
 spec:
+  type: NodePort
   selector:
     app: frontend
   ports:
     - name: http
       port: 80
       targetPort: 80
-  type: ClusterIP
+      protocol: TCP
+      nodePort: 32500

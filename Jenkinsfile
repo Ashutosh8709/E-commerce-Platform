@@ -1,22 +1,78 @@
 @Library("Shared") _
 pipeline{
     agent { label 'agent-1' }
+
+    environment{
+        SONAR_HOME= tool "Sonar"
+    }
+
+
+    parameters{
+        string(name: 'FRONTEND_DOCKER_TAG',defaultValue: '', description: 'Setting docker image for latest push')
+        string(name: 'BACKEND_DOCKER_TAG',defaultValue: '', description: 'Setting docker image for latest push')
+    }
+
     stages{
-        stage("Hello"){
+        stage("Validate Parameters"){
             steps{
                 script{
-                    hello()
+                    if(params.FRONTEND_DOCKER_TAG == '' || params.BACKEND_DOCKER_TAG == ''){
+                        error("FRONTEND_DOCKER_TAG and BACKEND_DOCKER_TAG must be provided.")
+                    }
                 }
             }
         }
-        
-        stage("Code"){
+
+        stage("Workspace cleanup"){
+            steps{
+                script{
+                    cleanWs()
+                }
+            }
+        }
+
+        stage("Git: Code Clonning"){
             steps{
                 script{
                     clone("https://github.com/Ashutosh8709/E-commerce-Platform.git","main")
                 }
             }
         }
+
+
+        stage("Trivy: Filesystem scan"){
+            steps{
+                script{
+                    trivy_scan()
+                }
+            }
+        }
+
+        stage("OWASP: Dependency check"){
+            steps{
+                script{
+                    owasp_dependency()
+                }
+            }
+        }
+
+        stage("SonarQube: Code Analysis"){
+            steps{
+                script{
+                    sonarqube_analysis("Sonar","ecommerce","ecommerce")
+                }
+            }
+        }
+
+        stage("SonarQube: Code Quality Gates"){
+            steps{
+                script{
+                    sonarqube_code_quality()
+                }
+            }
+        }
+
+        
         stage('Inject ENV files') {
             steps {
                 withCredentials([
@@ -46,17 +102,15 @@ pipeline{
                     docker_push()
                 }
             }
-        }
-        stage("Test"){
-            steps{
-                echo "This is testing the code"
-            }
-        }
-        stage("Deploy"){
-            steps{
-                echo "This is deploying the code"
-                sh "docker compose up -d"
+        post{
+            success{
+                archiveArtifacts artifacts: '*.xml', followSymlinks: false
+                build job: "Ecommerce-CD", parameters: [
+                    string(name: 'FRONTEND_DOCKER_TAG', value: "${params.FRONTEND_DOCKER_TAG}"),
+                    string(name: 'BACKEND_DOCKER_TAG', value: "${params.BACKEND_DOCKER_TAG}")
+                ]
             }
         }
     }
+}
 }
