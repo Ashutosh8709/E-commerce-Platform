@@ -1,17 +1,13 @@
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import moment from "moment";
-import socket from "../socket";
 import {
   getAdminStats,
   getAllOrders,
   getSalesAnalytics,
 } from "../services/adminService";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { handleSuccess, handleError } from "../utils";
+import { useQuery } from "@tanstack/react-query";
 
 export function useAdminData() {
-  const queryClient = useQueryClient();
-
   const { data: statsData, isLoading: statsLoading } = useQuery({
     queryKey: ["admin-stats"],
     queryFn: getAdminStats,
@@ -37,62 +33,6 @@ export function useAdminData() {
   const stats = statsData?.data?.data || {};
   const orders = ordersData?.data?.data || [];
   const analytics = analyticsData?.data?.data || {};
-
-  useEffect(() => {
-    socket.on("order:new", (order) => {
-      queryClient.setQueryData(["admin-orders"], (old) => ({
-        ...old,
-        data: { data: [order, ...(old?.data?.data || [])] },
-      }));
-
-      queryClient.setQueryData(["admin-stats"], (old) => ({
-        ...old,
-        data: {
-          data: {
-            ...old.data.data,
-            totalOrders: old.data.data?.totalOrders + 1,
-            totalRevenue: old.data.data?.totalRevenue + order?.totalAmount,
-          },
-        },
-      }));
-      handleSuccess(`New Order — ₹${order?.totalAmount}`);
-    });
-
-    socket.on("order:statusUpdated", () => {
-      queryClient.invalidateQueries(["sales-analytics"]);
-      queryClient.invalidateQueries(["orders"]);
-      handleSuccess("Order Status Updated");
-    });
-
-    socket.on("product:lowStock", (item) => {
-      queryClient.setQueryData(["admin-stats"], (old) => ({
-        ...old,
-        data: {
-          data: {
-            ...old.data.data,
-            lowStockItems: [...old.data?.data?.lowStockItems, item],
-          },
-        },
-      }));
-      handleSuccess(`Low Stock — ${item?.name} (${item?.stock} left)`);
-    });
-
-    socket.on("disconnect", () => {
-      console.warn("Disconnected from socket server");
-    });
-
-    socket.on("connect", () => {
-      console.info("Reconnected — syncing dashboard data");
-    });
-
-    return () => {
-      socket.off("order:new");
-      socket.off("order:statusUpdated");
-      socket.off("product:lowStock");
-      socket.off("connect");
-      socket.off("disconnect");
-    };
-  }, [queryClient]);
 
   const lineChartData = useMemo(
     () => ({
