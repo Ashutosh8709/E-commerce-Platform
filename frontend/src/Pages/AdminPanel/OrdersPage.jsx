@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { ShoppingCart, Search, Eye, Trash2, RefreshCw } from "lucide-react";
+import { ShoppingCart, Search, Eye, RefreshCw } from "lucide-react";
 import moment from "moment";
 import { useAdminData } from "../../hooks/useAdminData";
 import { handleSuccess } from "../../utils";
