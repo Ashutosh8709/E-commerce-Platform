@@ -8,7 +8,7 @@ import {
   Sparkles,
   Zap,
 } from "lucide-react";
-import { getNew, getById } from "../../services/productService";
+import { getNew } from "../../services/productService";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 function DealsNewArrivalsPage() {
@@ -16,7 +16,7 @@ function DealsNewArrivalsPage() {
 
   const queryClient = useQueryClient();
 
-  const { data, isLoading, isError, error, isFetching } = useQuery({
+  const { data } = useQuery({
     queryKey: ["newProducts"],
     queryFn: () => getNew(),
     keepPreviousData: true,

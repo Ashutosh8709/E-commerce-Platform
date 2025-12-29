@@ -254,8 +254,8 @@ const getProductById = asyncHandler(async (req, res) => {
 });
 
 const getProducts = asyncHandler(async (req, res) => {
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 10;
+  const page = Number.parseInt(req.query.page) || 1;
+  const limit = Number.parseInt(req.query.limit) || 10;
 
   const cacheKey = `products:page:${page}:limit:${limit}`;
   let cachedData;

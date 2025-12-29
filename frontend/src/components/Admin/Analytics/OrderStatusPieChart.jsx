@@ -1,6 +1,6 @@
 import React from "react";
 import { useAdminData } from "../../../hooks/useAdminData";
-import { Line, Pie, Bar } from "react-chartjs-2";
+import { Pie } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   LineElement,

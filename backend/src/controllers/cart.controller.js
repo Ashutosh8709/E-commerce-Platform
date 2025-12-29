@@ -7,7 +7,7 @@ import { PromoCode } from "../models/promoCode.model.js";
 import { Order } from "../models/order.model.js";
 import { Payment } from "../models/payment.model.js";
 import { getRazorpayInstance } from "../config/razorpay.js";
-import crypto from "crypto";
+import crypto from "node:crypto";
 import mongoose from "mongoose";
 
 const addToCart = asyncHandler(async (req, res) => {

@@ -1,9 +1,9 @@
 import AdminNavbar from "../components/Navbar/AdminNavbar";
 import AdminSidebar from "../components/SideBar/AdminSidebar";
-import { useState } from "react";
+
 import { Outlet, useParams } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 
 export default function AdminLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);

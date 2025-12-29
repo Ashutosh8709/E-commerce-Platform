@@ -3,7 +3,7 @@ dotenv.config({ path: "./.env" });
 
 import connectDB from "./db/index.js";
 import { app } from "./app.js";
-import http from "http";
+import http from "node:http";
 import { Server } from "socket.io";
 
 const server = http.createServer(app);

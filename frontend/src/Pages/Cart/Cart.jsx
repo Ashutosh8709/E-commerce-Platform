@@ -10,7 +10,7 @@ function ShoppingCartPage() {
 
   if (loading) return <div>Loading cart...</div>;
 
-  const shipping = cart?.products?.length > 0 ? 10.0 : 0;
+  const shipping = cart?.products?.length > 0 ? 10 : 0;
   const discount = cart?.discount;
   const total = cart?.totalAmount + shipping - discount;
 

@@ -1,12 +1,6 @@
 import React from "react";
 import { useAdminData } from "../../../hooks/useAdminData";
-import {
-  ShoppingCart,
-  DollarSign,
-  TrendingUp,
-  AlertTriangle,
-  PieChart,
-} from "lucide-react";
+import { ShoppingCart, DollarSign, AlertTriangle } from "lucide-react";
 
 function KPIgrid() {
   const { stats } = useAdminData();

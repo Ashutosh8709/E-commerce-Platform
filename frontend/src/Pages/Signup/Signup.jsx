@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { Upload, User, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
-import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 function Signup() {
   const [formData, setFormData] = useState({

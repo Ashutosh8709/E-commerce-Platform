@@ -1,8 +1,7 @@
-import { useParams } from "react-router-dom";
 import { Check, Truck, Home, ChevronRight, Package } from "lucide-react";
 import { useOrder } from "../../hooks/useOrderQuery";
 import moment from "moment";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 function OrderTrackingPage() {
   const { orderId } = useParams();

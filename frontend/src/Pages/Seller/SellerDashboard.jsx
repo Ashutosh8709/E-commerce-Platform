@@ -69,8 +69,8 @@ export default function SellerStorePage() {
           {
             ...productForm,
             store_id: selectedStore.id,
-            price: parseFloat(productForm.price),
-            stock: parseInt(productForm.stock),
+            price: Number.parseFloat(productForm.price),
+            stock: Number.parseInt(productForm.stock),
           },
         ])
         .select()
