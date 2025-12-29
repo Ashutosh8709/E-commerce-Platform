@@ -6,6 +6,8 @@ import { handleSuccess } from "../utils";
 export function useSocketListeners() {
   const queryClient = useQueryClient();
 
+  const isAdminPage = window.location.pathname.startsWith("/admin");
+
   useEffect(() => {
     console.log("%c⚡ Socket Listeners Attached Once", "color: yellow");
     socket.off("order:new");
@@ -71,13 +73,13 @@ export function useSocketListeners() {
         };
       });
       queryClient.invalidateQueries(["sales-analytics"]);
-      handleSuccess(`New Order — ₹${order.totalAmount}`);
+      if (isAdminPage) handleSuccess(`New Order — ₹${order.totalAmount}`);
     });
 
     socket.on("order:statusUpdated", () => {
       queryClient.invalidateQueries(["sales-analytics"]);
       queryClient.invalidateQueries(["admin-orders"]);
-      handleSuccess("Order Status Updated");
+      if (isAdminPage) handleSuccess("Order Status Updated");
     });
 
     socket.on("product:lowStock", (item) => {
@@ -95,7 +97,8 @@ export function useSocketListeners() {
         };
       });
 
-      handleSuccess(`Low Stock — ${item.name} (${item.stock} left)`);
+      if (isAdminPage)
+        handleSuccess(`Low Stock — ${item.name} (${item.stock} left)`);
     });
 
     return () => {
@@ -104,5 +107,5 @@ export function useSocketListeners() {
       socket.off("product:lowStock");
       console.log("%c❌ Socket listeners cleaned", "color:red");
     };
-  }, [queryClient]);
+  }, [queryClient, isAdminPage]);
 }

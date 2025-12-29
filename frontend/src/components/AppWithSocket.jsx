@@ -200,14 +200,18 @@ const router = createBrowserRouter([
 ]);
 
 function AppWithSocket() {
-  useSocketListeners();
-
   return (
     <AuthContextProvider>
+      <SocketWrapper />
       <RouterProvider router={router} />
       <ToastContainer />
     </AuthContextProvider>
   );
+}
+
+function SocketWrapper() {
+  useSocketListeners();
+  return null;
 }
 
 export default AppWithSocket;

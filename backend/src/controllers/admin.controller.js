@@ -31,11 +31,11 @@ const getAdminStats = asyncHandler(async (req, res) => {
   //total revenue, total orders, low stock items
   const [orderStats, lowStockItems] = await Promise.all([
     Order.aggregate([
+      { $match: { paymentStatus: "paid" } },
       {
         $facet: {
           totalOrders: [{ $count: "count" }],
           totalRevenue: [
-            { $match: { paymentStatus: "paid" } },
             { $group: { _id: null, total: { $sum: "$finalAmount" } } },
           ],
         },
