@@ -8,7 +8,7 @@ export const create = (
   stock,
   colors,
   categoryId,
-  productImage
+  productImage,
 ) => {
   const form = new FormData();
   form.append("name", name);
@@ -51,3 +51,7 @@ export const getTopRated = () => {};
 export const filterProd = () => {};
 
 export const getRelated = () => {};
+
+export const searchProd = (query) => {
+  return api.get(`/product/search?q=${query}`);
+};

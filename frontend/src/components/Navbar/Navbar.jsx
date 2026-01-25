@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Search,
   ShoppingCart,
@@ -22,6 +22,8 @@ import { useCart } from "../../hooks/useCartQuery";
 import { useWishlist } from "../../hooks/useWishlistQuery";
 import { useQueryClient } from "@tanstack/react-query";
 import { get } from "../../services/productService";
+import { useDebounce } from "../../hooks/useDebounce";
+import { searchProd } from "../../services/productService";
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -30,6 +32,9 @@ function Navbar() {
   const { cart } = useCart();
   const { prefetchWishlist } = useWishlist();
   const queryClient = useQueryClient();
+  const [query, setQuery] = useState("");
+  const [prods, setProducts] = useState([]);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const handleLogout = async () => {
     await logout();
@@ -42,6 +47,26 @@ function Navbar() {
       staleTime: 5 * 60 * 1000, // optional
     });
   };
+
+  const debouncedQuery = useDebounce(query, 500);
+
+  useEffect(() => {
+    if (!debouncedQuery) {
+      setProducts([]);
+      return;
+    }
+
+    const fetchSearch = async () => {
+      try {
+        const res = await searchProd(debouncedQuery);
+        setProducts(res.data?.data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    fetchSearch();
+  }, [debouncedQuery]);
 
   return (
     <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-200 shadow-sm">
@@ -120,13 +145,58 @@ function Navbar() {
             {user ? (
               <>
                 {/* Search Bar */}
-                <div className="hidden sm:flex relative">
+                <div className="hidden sm:flex relative z-50">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
                     type="text"
-                    placeholder="Search"
+                    placeholder="Search products..."
                     className="pl-10 pr-4 py-2 w-64 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-gray-50"
+                    value={query}
+                    onChange={(e) => {
+                      setQuery(e.target.value);
+                      setIsSearchOpen(true);
+                    }}
+                    onFocus={() => setIsSearchOpen(true)}
                   />
+
+                  {/* 🔍 SEARCH DROPDOWN */}
+                  {isSearchOpen && prods.length > 0 && (
+                    <div className="absolute top-12 left-0 w-full bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden">
+                      {prods.slice(0, 6).map((p) => (
+                        <Link
+                          to={`/product/${p._id}`}
+                          key={p._id}
+                          onClick={() => {
+                            setIsSearchOpen(false);
+                            setQuery("");
+                          }}
+                          className="flex items-center gap-3 px-4 py-3 hover:bg-indigo-50 transition"
+                        >
+                          <img
+                            src={p.productImage}
+                            alt={p.name}
+                            className="w-10 h-10 object-cover rounded-md"
+                          />
+
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-gray-900 line-clamp-1">
+                              {p.name}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              ₹{p.offeredPrice}
+                            </p>
+                          </div>
+                        </Link>
+                      ))}
+
+                      {/* <Link
+                        to={`/search?q=${query}`}
+                        className="block text-center text-sm py-2 text-indigo-600 hover:bg-indigo-50 border-t"
+                      >
+                        View all results →
+                      </Link> */}
+                    </div>
+                  )}
                 </div>
 
                 {/* Action Buttons */}

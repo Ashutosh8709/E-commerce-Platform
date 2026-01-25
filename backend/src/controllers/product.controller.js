@@ -485,7 +485,7 @@ const searchProduct = asyncHandler(async (req, res) => {
         index: "productSearch",
         text: {
           query: q,
-          path: ["name", "description", "brand"],
+          path: ["name", "brand"],
           fuzzy: {
             maxEdits: 2,
             prefixLength: 1,
