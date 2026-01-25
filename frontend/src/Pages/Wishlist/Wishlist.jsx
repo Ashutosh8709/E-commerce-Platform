@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Heart, Trash2, ShoppingBag } from "lucide-react";
 import { useWishlist } from "../../hooks/useWishlistQuery";
+import { Link } from "react-router-dom";
 
 function Wishlist() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -132,7 +133,7 @@ function Wishlist() {
               // }
               className="bg-indigo-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-indigo-700 transition-colors"
             >
-              Start Shopping
+              <Link to={"/products"}>Start Shopping</Link>
             </button>
           </div>
         )}

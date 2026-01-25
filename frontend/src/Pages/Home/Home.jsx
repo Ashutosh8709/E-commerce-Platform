@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 function LandingPage() {
   const [isProfileOpen, setIsProfileOpen] = React.useState(true);
@@ -24,7 +25,7 @@ function LandingPage() {
               your living space.
             </p>
             <button className="bg-indigo-600 text-white px-6 py-3 rounded-lg text-base font-bold shadow-lg hover:bg-indigo-700 transform transition-all duration-200 hover:scale-105">
-              Shop Now
+              <Link to={"/products"}>Shop Now</Link>
             </button>
           </div>
         </div>
