@@ -1,14 +1,14 @@
 import { useSocketListeners } from "../hooks/useSocketListeners";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import { AuthContextProvider } from "../context/AuthContext.jsx";
 import Layout from "../Layout/Layout.jsx";
 import LandingPage from "../Pages/LandingPage/LandingPage.jsx";
 import Login from "../Pages/Login/Login.jsx";
 import Signup from "../Pages/Signup/Signup.jsx";
 import ForgotPasswordPage from "../Pages/Login/ForgotPassword.jsx";
-import { AuthContextProvider } from "../context/AuthContext.jsx";
 import Home from "../Pages/Home/Home.jsx";
 import ProtectedRoute from "../components/ProtectedRoute.jsx";
-import { ToastContainer } from "react-toastify";
 import Cart from "../Pages/Cart/Cart.jsx";
 import Checkout from "../Pages/CheckOut/CheckOut.jsx";
 import ProductListing from "../Pages/Products/ProductListing.jsx";

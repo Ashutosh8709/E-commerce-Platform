@@ -44,7 +44,7 @@ const addToCart = asyncHandler(async (req, res) => {
     (p) =>
       p.productId.toString() === productId &&
       (!color || p.color === color) &&
-      (!size || p.size === size)
+      (!size || p.size === size),
   );
 
   if (existingProduct) {
@@ -90,6 +90,8 @@ const updateQuantity = asyncHandler(async (req, res) => {
   const { quantity } = req.body;
   const userId = req.user?._id;
 
+  if (quantity < 1) throw new ApiError(400, "Quantity cannot be less than 1");
+
   let cart = await Cart.findOne({ owner: userId });
   if (!cart) {
     throw new ApiError(404, "No Cart Available");
@@ -116,7 +118,7 @@ const removeItem = asyncHandler(async (req, res) => {
   const cart = await Cart.findOneAndUpdate(
     { owner: userId },
     { $pull: { products: { productId } } },
-    { new: true }
+    { new: true },
   );
 
   if (!cart) {
@@ -144,7 +146,7 @@ const clearCart = asyncHandler(async (req, res) => {
         status: "active",
       },
     },
-    { new: true }
+    { new: true },
   );
   if (!cart) {
     throw new ApiError(404, "No cart Found");
@@ -167,7 +169,7 @@ const savedForLater = asyncHandler(async (req, res) => {
       $pull: { products: { productId } },
       $addToSet: { savedForLater: productId },
     },
-    { new: true }
+    { new: true },
   );
 
   if (!cart) {
@@ -202,7 +204,7 @@ const applyPromoCode = asyncHandler(async (req, res) => {
   if (cart.totalAmount < promo.minPurchase) {
     throw new ApiError(
       400,
-      `Minimum Purchase of ${promo.minPurchase} required`
+      `Minimum Purchase of ${promo.minPurchase} required`,
     );
   }
 
@@ -289,7 +291,7 @@ const placeOrder = asyncHandler(async (req, res) => {
       new ApiResponse(200, {
         orderId: order._id,
         razorpayOrder,
-      })
+      }),
     );
   } catch (error) {
     console.error("placeOrder error:", error);
@@ -356,7 +358,7 @@ const verifyPayment = asyncHandler(async (req, res) => {
           status: "ordered",
         },
       },
-      { session }
+      { session },
     );
 
     await session.commitTransaction();

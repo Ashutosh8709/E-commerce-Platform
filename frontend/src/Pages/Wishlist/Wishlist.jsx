@@ -87,7 +87,7 @@ function Wishlist() {
                       {Math.round(
                         ((item.originalPrice - item.offeredPrice) /
                           item.originalPrice) *
-                          100
+                          100,
                       )}
                       % off
                     </span>
