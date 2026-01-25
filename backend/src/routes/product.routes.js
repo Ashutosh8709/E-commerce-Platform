@@ -12,6 +12,7 @@ import {
   getTopRatedProducts,
   filterProducts,
   getRelatedProducts,
+  searchProduct,
 } from "../controllers/product.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 
@@ -19,6 +20,7 @@ const router = Router();
 
 router.get("/featured", getFeaturedProducts);
 router.get("/new", getNewArrivals);
+router.get("/search", searchProduct);
 router.get("/top-rated", getTopRatedProducts);
 router.get("/category/:category", getProductsByCategory);
 router.post("/filter", filterProducts);

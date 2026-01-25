@@ -117,7 +117,7 @@ const updateProduct = asyncHandler(async (req, res) => {
   if (role !== "admin" && role !== "seller") {
     throw new ApiError(
       400,
-      "Only seller and admin are allowed to update the project"
+      "Only seller and admin are allowed to update the project",
     );
   }
 
@@ -138,7 +138,7 @@ const updateProduct = asyncHandler(async (req, res) => {
     {
       $set: fieldsToUpdate,
     },
-    { new: true, runValidators: true }
+    { new: true, runValidators: true },
   );
 
   if (!updatedProduct) {
@@ -165,7 +165,7 @@ const deleteProduct = asyncHandler(async (req, res) => {
   if (role !== "admin" && role !== "seller") {
     throw new ApiError(
       403,
-      "Access denied: only admin or seller can delete products"
+      "Access denied: only admin or seller can delete products",
     );
   }
 
@@ -222,7 +222,7 @@ const getProductById = asyncHandler(async (req, res) => {
   } catch (error) {
     console.error(
       "Redis unavaialable, continuing without cache:",
-      error.message
+      error.message,
     );
   }
   if (cachedProduct) {
@@ -232,8 +232,8 @@ const getProductById = asyncHandler(async (req, res) => {
         new ApiResponse(
           200,
           JSON.parse(cachedProduct),
-          "Product fetched from cache"
-        )
+          "Product fetched from cache",
+        ),
       );
   }
 
@@ -269,7 +269,7 @@ const getProducts = asyncHandler(async (req, res) => {
     return res
       .status(200)
       .json(
-        new ApiResponse(200, JSON.parse(cachedData), "Data fetched from cache")
+        new ApiResponse(200, JSON.parse(cachedData), "Data fetched from cache"),
       );
   }
 
@@ -341,7 +341,7 @@ const getFeaturedProducts = asyncHandler(async (req, res) => {
   } catch (error) {
     console.error(
       "Redis unavailable, continuing without cache:",
-      error.message
+      error.message,
     );
   }
   if (cachedFeaturedProduct) {
@@ -351,8 +351,8 @@ const getFeaturedProducts = asyncHandler(async (req, res) => {
         new ApiResponse(
           200,
           JSON.parse(cachedFeaturedProduct),
-          "Products fetched from cache"
-        )
+          "Products fetched from cache",
+        ),
       );
   }
 
@@ -368,7 +368,7 @@ const getFeaturedProducts = asyncHandler(async (req, res) => {
     await client.setex(
       "product:featured",
       3600,
-      JSON.stringify(featuredProducts)
+      JSON.stringify(featuredProducts),
     );
   } catch (error) {
     console.error("Redis cache save failed: ", error.message);
@@ -379,8 +379,8 @@ const getFeaturedProducts = asyncHandler(async (req, res) => {
       new ApiResponse(
         200,
         featuredProducts,
-        "Featured Products Fetched Successfully"
-      )
+        "Featured Products Fetched Successfully",
+      ),
     );
 });
 
@@ -399,8 +399,8 @@ const getNewArrivals = asyncHandler(async (req, res) => {
           new ApiResponse(
             200,
             JSON.parse(cachedData),
-            "New Arrivals Fetched from Cache"
-          )
+            "New Arrivals Fetched from Cache",
+          ),
         );
     }
   } catch (error) {
@@ -435,7 +435,7 @@ const getDeals = asyncHandler(async (req, res) => {
       return res
         .status(200)
         .json(
-          new ApiResponse(200, safeParse(cached), "Deals fetched from cache")
+          new ApiResponse(200, safeParse(cached), "Deals fetched from cache"),
         );
     }
   } catch (err) {
@@ -474,6 +474,35 @@ const filterProducts = asyncHandler(async (req, res) => {});
 
 const getRelatedProducts = asyncHandler(async (req, res) => {});
 
+const searchProduct = asyncHandler(async (req, res) => {
+  const { q } = req.query;
+
+  if (!q) throw new ApiError(400, "Search Query is required");
+
+  const products = await Product.aggregate([
+    {
+      $search: {
+        index: "productSearch",
+        text: {
+          query: q,
+          path: ["name", "description", "brand"],
+          fuzzy: {
+            maxEdits: 2,
+            prefixLength: 1,
+          },
+        },
+      },
+    },
+    { $limit: 20 },
+  ]);
+
+  if (products.length === 0) throw new ApiError(400, "Something went Wrong");
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, products, "Found the Product"));
+});
+
 export {
   createProduct,
   updateProduct,
@@ -487,4 +516,5 @@ export {
   getDeals,
   filterProducts,
   getRelatedProducts,
+  searchProduct,
 };
