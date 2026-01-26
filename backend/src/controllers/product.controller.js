@@ -171,7 +171,7 @@ const deleteProduct = asyncHandler(async (req, res) => {
 
   const { productId } = req.params;
   if (!productId) {
-    throw new ApiError(400, "Product not found");
+    throw new ApiError(400, "Product Id is Required");
   }
 
   const product = await Product.findById(productId);
@@ -468,12 +468,6 @@ const getDeals = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, deals, "Active deals fetched"));
 });
 
-const getTopRatedProducts = asyncHandler(async (req, res) => {});
-
-const filterProducts = asyncHandler(async (req, res) => {});
-
-const getRelatedProducts = asyncHandler(async (req, res) => {});
-
 const searchProduct = asyncHandler(async (req, res) => {
   const { q } = req.query;
 
@@ -502,6 +496,11 @@ const searchProduct = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, products, "Found the Product"));
 });
+const getTopRatedProducts = asyncHandler(async (req, res) => {});
+
+const filterProducts = asyncHandler(async (req, res) => {});
+
+const getRelatedProducts = asyncHandler(async (req, res) => {});
 
 export {
   createProduct,

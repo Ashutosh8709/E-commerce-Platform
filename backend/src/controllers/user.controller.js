@@ -270,6 +270,7 @@ const verifyUser = asyncHandler(async (req, res) => {
     throw new ApiError(404, "User not Found");
   }
 });
+
 export {
   registerUser,
   loginUser,

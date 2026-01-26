@@ -70,8 +70,8 @@ const getAdminStats = asyncHandler(async (req, res) => {
         totalRevenue: orderData.totalRevenue[0]?.total || 0,
         lowStockItems: lowStockItems.length === 0 ? [] : lowStockItems,
       },
-      "Stats fetched Successfully"
-    )
+      "Stats fetched Successfully",
+    ),
   );
 });
 
@@ -203,7 +203,7 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
     {
       status,
     },
-    { new: true }
+    { new: true },
   );
 
   if (!order) {
@@ -222,7 +222,25 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
 
 const addProduct = asyncHandler(async (req, res) => {});
 const updateProduct = asyncHandler(async (req, res) => {});
-const deleteProduct = asyncHandler(async (req, res) => {});
+const deleteProduct = asyncHandler(async (req, res) => {
+  // get product id from req params
+  // check if product exists
+  // delete the product
+
+  const { productId } = req.params;
+
+  if (!productId) throw new ApiError(404, "Product Id is required");
+
+  const res = await Product.findByIdAndDelete(productId);
+
+  if (!res) {
+    throw new ApiError(400, "Product Not Found");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Product Deleted Successfully"));
+});
 
 export {
   getAllOrders,
