@@ -11,7 +11,7 @@ export const signupUser = (formData) => {
   form.append("password", formData.password);
   if (formData.avatar) form.append("avatar", formData.avatar);
 
-  return api.post("/users/signup", form, {
+  return api.post("/users/register", form, {
     headers: { "Content-Type": "multipart/form-data" },
   });
 };

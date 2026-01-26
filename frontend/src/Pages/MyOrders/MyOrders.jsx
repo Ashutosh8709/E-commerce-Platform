@@ -21,7 +21,7 @@ function MyOrders() {
     selectedFilter === "all"
       ? orders
       : orders.filter((order) =>
-          order.status?.toLowerCase().includes(selectedFilter)
+          order.status?.toLowerCase().includes(selectedFilter),
         );
 
   if (loading) {
@@ -84,10 +84,10 @@ function MyOrders() {
                         order.status === "confirmed"
                           ? "bg-green-50 text-green-600"
                           : order.status === "placed"
-                          ? "bg-yellow-50 text-yellow-600"
-                          : order.status === "cancelled"
-                          ? "bg-red-50 text-red-600"
-                          : "bg-gray-100 text-gray-600"
+                            ? "bg-yellow-50 text-yellow-600"
+                            : order.status === "cancelled"
+                              ? "bg-red-50 text-red-600"
+                              : "bg-gray-100 text-gray-600"
                       }`}
                     >
                       {order.status}
@@ -160,7 +160,7 @@ function MyOrders() {
               You haven’t placed any orders yet.
             </p>
             <button className="bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-700 transition-colors">
-              Start Shopping
+              <Link to={"/products"}>Start Shopping</Link>
             </button>
           </div>
         )}

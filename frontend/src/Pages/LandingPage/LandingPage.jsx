@@ -32,7 +32,7 @@ function LandingPage() {
             delivered right to your doorstep.
           </p>
           <Link
-            to={"/home"}
+            to={"/login"}
             className="bg-indigo-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-indigo-700 transform transition-all duration-200 hover:scale-105 shadow-lg hover:shadow-xl"
           >
             Shop Now

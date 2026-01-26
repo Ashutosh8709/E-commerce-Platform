@@ -1,13 +1,15 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { get, add, remove, clear, addCart } from "../services/wishlistService";
 import { handleError, handleSuccess } from "../utils";
+import { useAuth } from "../context/AuthContext";
 
 export const useWishlist = () => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   const prefetchWishlist = async () => {
     await queryClient.prefetchQuery({
-      queryKey: ["wishlist"],
+      queryKey: ["wishlist", user?._id],
       queryFn: async () => {
         const res = await get();
         return res.data?.data[0]?.products || [];
@@ -18,7 +20,7 @@ export const useWishlist = () => {
 
   // 1️⃣ Fetch wishlist
   const { data: wishlist, isLoading } = useQuery({
-    queryKey: ["wishlist"],
+    queryKey: ["wishlist", user?._id],
     queryFn: async () => {
       const res = await get();
       return res.data?.data[0]?.products || [];
@@ -33,7 +35,7 @@ export const useWishlist = () => {
       await add(productId, color, size);
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["wishlist"] });
+      queryClient.invalidateQueries({ queryKey: ["wishlist", user?._id] });
       handleSuccess("Product added to wishlist");
     },
     onError: (error) => {
@@ -48,7 +50,7 @@ export const useWishlist = () => {
       return productId;
     },
     onSuccess: (productId) => {
-      queryClient.setQueryData(["wishlist"], (old) =>
+      queryClient.setQueryData(["wishlist", user?._id], (old) =>
         old.filter((item) => item.productId !== productId),
       );
       handleSuccess("Product removed from wishlist");
@@ -65,7 +67,7 @@ export const useWishlist = () => {
       return [];
     },
     onSuccess: () => {
-      queryClient.setQueryData(["wishlist"], []);
+      queryClient.setQueryData(["wishlist", user?._id], []);
       handleSuccess("Wishlist cleared");
     },
     onError: (error) => {
@@ -80,11 +82,11 @@ export const useWishlist = () => {
       return { productId, cart: res.data.data.cart };
     },
     onSuccess: ({ productId, cart }) => {
-      queryClient.setQueryData(["wishlist"], (old) =>
+      queryClient.setQueryData(["wishlist", user?._id], (old) =>
         old.filter((item) => item.productId !== productId),
       );
 
-      queryClient.setQueryData(["cart"], {
+      queryClient.setQueryData(["cart", user?._id], {
         discount: cart.discount || 0,
         totalAmount: cart.totalAmount || 0,
         promoCode: cart.promoCode || "",

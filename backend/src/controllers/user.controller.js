@@ -21,7 +21,7 @@ const generateAccessAndRefreshToken = async (userId) => {
     console.error(err.message);
     throw new ApiError(
       500,
-      "Something went wrong while generating Access and Refresh Tokens"
+      "Something went wrong while generating Access and Refresh Tokens",
     );
   }
 };
@@ -36,40 +36,39 @@ const registerUser = asyncHandler(async (req, res) => {
   // check user created or not
   // return res
 
-  const { name, email, password, role } = req.body;
+  const { name, email, password } = req.body;
 
   const existingUser = await User.findOne({ email });
   if (existingUser) {
     throw new ApiError(409, "User Already exists");
   }
-  const avatarLocalPath = req.file?.path;
-  if (!avatarLocalPath) {
-    throw new ApiError(400, "Avatar local file is missing");
-  }
+  let avatarUrl = "";
 
-  const avatar = await uploadOnCloudinary(avatarLocalPath);
-  if (!avatar) {
-    throw new ApiError(400, "Avatar CLoudinary file is required");
+  if (req.file?.path) {
+    const avatar = await uploadOnCloudinary(req.file?.path);
+    if (!avatar) {
+      throw new ApiError(400, "Avatar upload failed");
+    }
+    avatarUrl = avatar?.secure_url;
   }
 
   const user = await User.create({
     name,
     email,
     password,
-    avatar: avatar?.secure_url,
-    role,
+    avatar: avatarUrl,
   });
 
   const createdUser = await User.findById(user._id).select(
-    "-password -refreshToken"
+    "-password -refreshToken",
   );
   if (!createdUser) {
     throw new ApiError(500, "Something went wrong while registering the user");
   }
 
   return res
-    .status(200)
-    .json(new ApiResponse(200, createdUser, "User registered Successfully"));
+    .status(201)
+    .json(new ApiResponse(201, createdUser, "User registered Successfully"));
 });
 
 const loginUser = asyncHandler(async (req, res) => {
@@ -92,11 +91,11 @@ const loginUser = asyncHandler(async (req, res) => {
   }
 
   const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
-    user?._id
+    user?._id,
   );
 
   const loggedInUser = await User.findById(user._id).select(
-    "-password -refreshToken -createdAt -updatedAt"
+    "-password -refreshToken -createdAt -updatedAt",
   );
 
   const options = {
@@ -125,7 +124,7 @@ const logoutUser = asyncHandler(async (req, res) => {
     },
     {
       new: true,
-    }
+    },
   );
 
   const options = {
@@ -187,7 +186,7 @@ const getCurrentUser = asyncHandler(async (req, res) => {
     return res
       .status(200)
       .json(
-        new ApiResponse(200, req.user, "Current user fetched successfully")
+        new ApiResponse(200, req.user, "Current user fetched successfully"),
       );
   }
   throw new ApiError(404, "User not Logged in");
@@ -215,7 +214,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
         avatar: avatar?.secure_url,
       },
     },
-    { new: true }
+    { new: true },
   ).select("-password");
 
   return res
@@ -238,7 +237,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
   const updatedUser = await User.findByIdAndUpdate(
     userId,
     { $set: updates },
-    { new: true, runValidators: true }
+    { new: true, runValidators: true },
   ).select("-password");
 
   if (!updatedUser) {
@@ -248,7 +247,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(
-      new ApiResponse(200, updatedUser, "User Details Updated Successfully")
+      new ApiResponse(200, updatedUser, "User Details Updated Successfully"),
     );
 });
 

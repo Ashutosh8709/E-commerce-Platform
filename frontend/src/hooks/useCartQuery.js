@@ -8,16 +8,19 @@ import {
   save,
 } from "../services/cartService";
 import { handleError, handleSuccess } from "../utils";
+import { useAuth } from "../context/AuthContext";
 
 export const useCart = () => {
   const queryClient = useQueryClient();
+
+  const { user } = useAuth();
 
   const {
     data: cart,
     isLoading,
     refetch,
   } = useQuery({
-    queryKey: ["cart"],
+    queryKey: ["cart", user?._id],
     queryFn: async () => {
       const res = await get();
 
@@ -41,7 +44,7 @@ export const useCart = () => {
       return res.data.data;
     },
     onSuccess: (data) => {
-      queryClient.setQueryData(["cart"], data);
+      queryClient.setQueryData(["cart", user?._id], data);
       handleSuccess("Product added to cart");
     },
     onError: (error) => {
@@ -55,7 +58,7 @@ export const useCart = () => {
       const res = await updateQuan(productId, quantity);
       return res.data.data;
     },
-    onSuccess: (data) => queryClient.setQueryData(["cart"], data),
+    onSuccess: (data) => queryClient.setQueryData(["cart", user?._id], data),
     onError: (error) =>
       handleError(error?.response?.data?.message || "Something went wrong"),
   });
@@ -67,7 +70,7 @@ export const useCart = () => {
       return res.data.data;
     },
     onSuccess: (data) => {
-      queryClient.setQueryData(["cart"], data);
+      queryClient.setQueryData(["cart", user?._id], data);
       handleSuccess("Item removed from cart");
     },
     onError: (error) =>
@@ -81,7 +84,7 @@ export const useCart = () => {
       return res.data.data;
     },
     onSuccess: () => {
-      queryClient.setQueryData(["cart"], {
+      queryClient.setQueryData(["cart", user?._id], {
         discount: 0,
         totalAmount: 0,
         promoCode: "",
@@ -100,7 +103,7 @@ export const useCart = () => {
       return res.data.data;
     },
     onSuccess: (data) => {
-      queryClient.setQueryData(["cart"], data);
+      queryClient.setQueryData(["cart", user?._id], data);
       handleSuccess("Item saved for later");
     },
     onError: (error) =>

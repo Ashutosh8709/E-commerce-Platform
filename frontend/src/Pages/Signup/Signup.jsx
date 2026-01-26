@@ -16,12 +16,12 @@ function Signup() {
   const [avatarPreview, setAvatarPreview] = useState("");
   const navigate = useNavigate();
 
-  const { signup } = useAuth;
+  const { signup } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     await signup(formData);
-    navigate("/home");
+    navigate("/login");
   };
 
   const handleInputChange = (e) => {

@@ -9,17 +9,19 @@ import {
 import { handleError, handleSuccess } from "../utils";
 import { placeOrder, verifyPayment } from "../services/cartService";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export const useOrder = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   const {
     data: orders = [],
     isLoading,
     isFetching,
   } = useQuery({
-    queryKey: ["orders"],
+    queryKey: ["orders", user?._id],
     queryFn: async () => {
       const res = await getUserOrders();
       return res.data.data || [];
@@ -30,7 +32,7 @@ export const useOrder = () => {
 
   const getOrderById = (orderId) =>
     useQuery({
-      queryKey: ["order", orderId],
+      queryKey: ["order", user?._id, orderId],
       queryFn: async () => {
         const res = await getById(orderId);
         return res.data.data;
@@ -45,10 +47,10 @@ export const useOrder = () => {
       return res.data.data;
     },
     onSuccess: (updatedOrder) => {
-      queryClient.setQueryData(["orders"], (old = []) =>
+      queryClient.setQueryData(["orders", user?._id], (old = []) =>
         old.map((order) =>
-          order._id === updatedOrder._id ? updatedOrder : order
-        )
+          order._id === updatedOrder._id ? updatedOrder : order,
+        ),
       );
       handleSuccess("Order cancelled successfully");
     },
@@ -62,10 +64,10 @@ export const useOrder = () => {
       return res.data.data;
     },
     onSuccess: (updatedOrder) => {
-      queryClient.setQueryData(["orders"], (old = []) =>
+      queryClient.setQueryData(["orders", user?._id], (old = []) =>
         old.map((order) =>
-          order._id === updatedOrder._id ? updatedOrder : order
-        )
+          order._id === updatedOrder._id ? updatedOrder : order,
+        ),
       );
       handleSuccess("Order return request placed successfully");
     },
@@ -79,7 +81,10 @@ export const useOrder = () => {
       return res.data.data;
     },
     onSuccess: (newOrder) => {
-      queryClient.setQueryData(["orders"], (old = []) => [newOrder, ...old]);
+      queryClient.setQueryData(["orders", user?._id], (old = []) => [
+        newOrder,
+        ...old,
+      ]);
       handleSuccess("Order reordered successfully");
     },
     onError: (error) =>
@@ -106,8 +111,8 @@ export const useOrder = () => {
               handleSuccess("Payment Successful");
 
               await Promise.all([
-                queryClient.invalidateQueries(["orders"]),
-                queryClient.invalidateQueries(["cart"]),
+                queryClient.invalidateQueries(["orders", user?._id]),
+                queryClient.invalidateQueries(["cart", user?._id]),
               ]);
 
               setTimeout(() => navigate("/orders"), 200);
