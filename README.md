@@ -1,6 +1,6 @@
 # 🚀 SwiftCart – Full-Stack E‑Commerce Platform
 
-### **Production‑Grade Architecture | Event‑Driven | Real‑Time Updates | Docker | Jenkins | Kubernetes | MLOps‑Ready**
+### **Production‑Grade Architecture | Event‑Driven | Real‑Time Updates | Docker | Jenkins | Kubernetes **
 
 ### **Author: Ashutosh Kumar**
 
